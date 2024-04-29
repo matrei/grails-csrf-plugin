@@ -1,0 +1,72 @@
+plugins {
+    id 'application'
+    id 'com.bertramlabs.asset-pipeline'
+    id 'com.github.erdi.webdriver-binaries'
+    id 'groovy'
+}
+
+version = projectVersion
+group = 'csrf.test.app'
+
+ext.set('grailsVersion', libs.versions.grails.asProvider().get())
+
+// These plugins must be applied after grailsVersion has been set
+apply plugin: 'org.grails.grails-gsp'
+apply plugin: 'org.grails.grails-web'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.grails.org/grails/core' }
+}
+
+dependencies {
+
+/*
+    // Temporary workaround for Intellij Grails plugin
+    implementation 'org.grails:grails-shell:6.1.2', {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+*/
+
+    runtimeOnly project(':grails-csrf-plugin')
+
+    implementation libs.grails.core
+    implementation libs.grails.gsp // Needs to be implementation for GSP compilation to work
+    implementation libs.springboot.starter
+
+    runtimeOnly libs.assetpipeline.grails
+    runtimeOnly libs.grails.i18n
+    runtimeOnly libs.grails.urlmappings
+    runtimeOnly libs.springboot.autoconfigure
+    runtimeOnly libs.springboot.starter.logging
+    runtimeOnly libs.springboot.starter.tomcat
+
+    testImplementation libs.grails.testingsupport.web
+    testImplementation libs.spock.core
+    integrationTestImplementation libs.bundles.geb
+    integrationTestRuntimeOnly libs.bundles.selenium
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(libs.versions.java.baseline.get())
+}
+
+application {
+    mainClass = 'csrf.test.app.Application'
+}
+
+webdriverBinaries {
+    chromedriver {
+        version = '110.0.5481.77'
+        fallbackTo32Bit = true
+    }
+    geckodriver = '0.32.2'
+    edgedriver = '110.0.1587.57'
+}
+
+assets {
+    minifyJs = true
+    minifyCss = true
+}
+
+apply from: rootProject.layout.projectDirectory.file('gradle/testing-config.gradle')

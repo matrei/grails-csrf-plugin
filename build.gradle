@@ -1,0 +1,6 @@
+plugins {
+    id 'groovy'
+}
+
+group = 'io.github.matrei'
+version = projectVersion
