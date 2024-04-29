@@ -1,0 +1,9 @@
+rootProject.name = "grails-csrf"
+
+include 'plugin'
+project(':plugin').name = 'grails-csrf-plugin'
+
+file('examples').eachDir { dir ->
+    include "examples-$dir.name"
+    project(":examples-$dir.name").projectDir = dir
+}

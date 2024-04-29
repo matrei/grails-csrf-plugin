@@ -1,0 +1,15 @@
+
+/*
+tasks.named('bootRun') {
+    enabled = false // Plugins should not create a bootRun task
+}
+*/
+
+tasks.named('bootJar') {
+    enabled = false // Plugins should not create a bootJar
+}
+
+tasks.named('jar', Jar) {
+    enabled = true // Enable the jar task again, as the bootJar task has been disabled
+    archiveClassifier = '' // Remove '-plain' suffix from the jar filename
+}

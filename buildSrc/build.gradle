@@ -1,0 +1,18 @@
+plugins {
+    id 'groovy-gradle-plugin'
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.grails.org/grails/core' }
+}
+
+dependencies {
+
+    implementation buildsrcLibs.nexuspublish.gradleplugin
+
+    runtimeOnly buildsrcLibs.assetpipeline.gradleplugin
+    runtimeOnly buildsrcLibs.grails.gradleplugin
+    runtimeOnly buildsrcLibs.grails.gsp.gradleplugin
+    runtimeOnly buildsrcLibs.webdriverbinaries.gradleplugin
+}

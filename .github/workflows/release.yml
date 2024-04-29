@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    env:
+      GIT_USER_NAME: matrei
+      GIT_USER_EMAIL: mattias.reichel@gmail.com
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/wrapper-validation-action@v2
+      - uses: actions/setup-java@v4
+        with: { java-version: 11, distribution: temurin }
+      - uses: gradle/actions/setup-gradle@v3
+      - uses: matrei/github-actions/pre-release@main
+      - run: echo "$SECRING_FILE" | base64 -d > ${{ github.workspace }}/secring.gpg
+        if: success()
+        env:
+          SECRING_FILE: ${{ secrets.SECRING_FILE }}
+      - run: >
+          ./gradlew
+          -Prelease=true
+          -Psigning.secretKeyRingFile=${{ github.workspace }}/secring.gpg
+          publishToSonatype
+          closeAndReleaseSonatypeStagingRepository
+        if: success()
+        env:
+          ORG_GRADLE_PROJECT_sonatypeOssUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypeOssPassword: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_sonatypeOssStagingProfileId: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
+      - uses: matrei/github-actions/post-release@main
+        if: success()
