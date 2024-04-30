@@ -1,5 +1,3 @@
-ext.set('isSnapshot', project.version.toString().endsWith('-SNAPSHOT'))
-ext.set('isReleaseVersion', !isSnapshot)
 ext.set('signing.keyId', findProperty('signing.keyId') ?: System.getenv('SIGNING_KEY'))
 ext.set('signing.password', findProperty('signing.password') ?: System.getenv('SIGNING_PASSPHRASE'))
 
@@ -50,21 +48,3 @@ afterEvaluate {
         se.sign(mavenPublication.get())
     }
 }
-
-if (isReleaseVersion && project.hasProperty('release')) {
-    nexusPublishing {
-        String sonatypeUsername = project.findProperty('sonatypeOssUsername')
-        String sonatypePassword = project.findProperty('sonatypeOssPassword')
-        String sonatypeStagingProfileId = project.findProperty('sonatypeOssStagingProfileId')
-        repositories {
-            sonatype {
-                nexusUrl = uri('https://s01.oss.sonatype.org/service/local/')
-                snapshotRepositoryUrl = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
-                username = sonatypeUsername
-                password = sonatypePassword
-                stagingProfileId = sonatypeStagingProfileId
-            }
-        }
-    }
-}
-
