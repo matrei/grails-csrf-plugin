@@ -30,8 +30,8 @@ jobs:
           ./gradlew
           -Prelease=true
           -Psigning.secretKeyRingFile=${{ github.workspace }}/secring.gpg
-          publishToSonatype
-          closeAndReleaseSonatypeStagingRepository
+          grails-csrf-plugin:publishToSonatype
+          grails-csrf-plugin:closeAndReleaseSonatypeStagingRepository
         if: success()
         env:
           ORG_GRADLE_PROJECT_sonatypeOssUsername: ${{ secrets.SONATYPE_USERNAME }}
