@@ -3,16 +3,11 @@ plugins {
     id 'com.bertramlabs.asset-pipeline'
     id 'com.github.erdi.webdriver-binaries'
     id 'groovy'
+    id 'org.grails.grails-gsp'
+    id 'org.grails.grails-web'
 }
 
-version = projectVersion
 group = 'csrf.test.app'
-
-ext.set('grailsVersion', libs.versions.grails.asProvider().get())
-
-// These plugins must be applied after grailsVersion has been set
-apply plugin: 'org.grails.grails-gsp'
-apply plugin: 'org.grails.grails-web'
 
 repositories {
     mavenCentral()

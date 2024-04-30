@@ -5,27 +5,8 @@ plugins {
     id 'io.github.gradle-nexus.publish-plugin'
 }
 
-group = 'io.github.matrei'
 version = projectVersion
-ext.set('isSnapshot', projectVersion.endsWith('-SNAPSHOT'))
-ext.set('isReleaseVersion', !isSnapshot)
-
-if (isReleaseVersion && project.hasProperty('release')) {
-    nexusPublishing {
-        String sonatypeUsername = project.findProperty('sonatypeOssUsername')
-        String sonatypePassword = project.findProperty('sonatypeOssPassword')
-        String sonatypeStagingProfileId = project.findProperty('sonatypeOssStagingProfileId')
-        repositories {
-            sonatype {
-                nexusUrl = uri('https://s01.oss.sonatype.org/service/local/')
-                snapshotRepositoryUrl = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
-                username = sonatypeUsername
-                password = sonatypePassword
-                stagingProfileId = sonatypeStagingProfileId
-            }
-        }
-    }
-}
+ext.set('grailsVersion', libs.versions.grails.asProvider().get())
 
 //do not generate extra load on Nexus with new staging repository if signing fails
 tasks.withType(InitializeNexusStagingRepository).configureEach {
