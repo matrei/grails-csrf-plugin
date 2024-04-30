@@ -1,6 +1,15 @@
+import io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository
+
 plugins {
     id 'groovy'
+    id 'io.github.gradle-nexus.publish-plugin'
 }
 
 group = 'io.github.matrei'
 version = projectVersion
+ext.set('isReleaseVersion', !version.toString().endsWith('-SNAPSHOT'))
+
+//do not generate extra load on Nexus with new staging repository if signing fails
+tasks.withType(InitializeNexusStagingRepository).configureEach {
+    shouldRunAfter = tasks.withType(Sign)
+}
