@@ -7,6 +7,7 @@ plugins {
 }
 
 group = 'io.github.matrei'
+version = rootProject.version
 
 repositories {
     mavenCentral()
