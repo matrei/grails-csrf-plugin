@@ -2,14 +2,12 @@
 assetpipeline-gradleplugin = '4.4.0'
 grails-gradleplugin = '6.2.0'
 grails-gsp = '6.2.1'
-grails-views = '3.2.3'
 nexuspublish-gradleplugin = '2.0.0'
 webdriver-binaries = '3.2'
 
 [libraries]
+assetpipeline-gradleplugin = { module = 'com.bertramlabs.plugins:asset-pipeline-gradle', version.ref='assetpipeline-gradleplugin' }
 grails-gradleplugin = { module = 'org.grails:grails-gradle-plugin', version.ref = 'grails-gradleplugin' }
 grails-gsp-gradleplugin = { module = 'org.grails.plugins:gsp', version.ref = 'grails-gsp' }
-grails-views-gradleplugin = { module = 'org.grails.plugins:views-gradle', version.ref = 'grails-views' }
 nexuspublish-gradleplugin = { module = 'io.github.gradle-nexus:publish-plugin', version.ref = 'nexuspublish-gradleplugin' }
-assetpipeline-gradleplugin = { module = 'com.bertramlabs.plugins:asset-pipeline-gradle', version.ref='assetpipeline-gradleplugin' }
 webdriverbinaries-gradleplugin = { module = 'com.github.erdi:webdriver-binaries-gradle-plugin', version.ref = 'webdriver-binaries' }
