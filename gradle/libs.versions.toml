@@ -11,7 +11,7 @@ servlet-api = '4.0.1'
 micronaut = '3.10.4'
 selenium = '4.19.1'
 slf4j = '1.7.36'
-spock = '2.3-groovy-3.0'
+spock = '2.3-groovy-4.0'
 spring = '5.3.34'
 springboot = '2.7.18'
 
