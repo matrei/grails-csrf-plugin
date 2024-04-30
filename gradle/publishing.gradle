@@ -1,71 +1,59 @@
-import io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository
-
-import java.time.Duration
-
 def javaComponent = components.named('java')
-publishing {
-    publications {
-        register('csrfPlugin', MavenPublication) {
-            artifactId = rootProject.name
-            from javaComponent.get()
-            versionMapping {
-                usage('java-api') { fromResolutionOf('runtimeClasspath') }
-                usage('java-runtime') { fromResolutionResult() }
+extensions.configure(PublishingExtension) { PublishingExtension pe ->
+    pe.publications.register('csrfPlugin', MavenPublication) {
+        artifactId = rootProject.name
+        from javaComponent.get()
+        versionMapping {
+            usage('java-api') { fromResolutionOf('runtimeClasspath') }
+            usage('java-runtime') { fromResolutionResult() }
+        }
+        pom {
+            name = 'Grails Plugin for CSRF protection'
+            description = 'Provides CSRF protection for Grails applications.'
+            url = 'https://github.com/matrei/grails-csrf-plugin'
+            licenses {
+                license {
+                    name = 'The Apache License, Version 2.0'
+                    url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
             }
-            pom {
-                name = 'Grails Plugin for CSRF protection'
-                description = 'Provides CSRF protection for Grails applications.'
+            developers {
+                developer {
+                    id = 'matrei'
+                    name = 'Mattias Reichel'
+                    email = 'mattias.reichel@gmail.com'
+                }
+            }
+            scm {
+                connection = 'scm:git:git://github.com/matrei/grails-csrf-plugin.git'
+                developerConnection = 'scm:git:ssh://github.com:matrei/grails-csrf-plugin.git'
                 url = 'https://github.com/matrei/grails-csrf-plugin'
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'matrei'
-                        name = 'Mattias Reichel'
-                        email = 'mattias.reichel@gmail.com'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/matrei/grails-csrf-plugin.git'
-                    developerConnection = 'scm:git:ssh://github.com:matrei/grails-csrf-plugin.git'
-                    url = 'https://github.com/matrei/grails-csrf-plugin'
-                }
             }
-            // dependency management shouldn't be included
-            pom.withXml {
-                def root = it.asElement()
-                root.getElementsByTagName('dependencyManagement').each { root.removeChild(it) }
-            }
+        }
+        // dependency management shouldn't be included
+        pom.withXml {
+            def root = it.asElement()
+            root.getElementsByTagName('dependencyManagement').each { root.removeChild(it) }
         }
     }
 }
 
-ext.set('signing.keyId', System.getenv('SIGNING_KEY'))
-ext.set('signing.password', System.getenv('SIGNING_PASSPHRASE'))
-ext.set('isReleaseVersion', !version.toString().endsWith('-SNAPSHOT'))
+ext.set('signing.keyId', findProperty('signing.keyId') ?: System.getenv('SIGNING_KEY'))
+ext.set('signing.password', findProperty('signing.password') ?: System.getenv('SIGNING_PASSPHRASE'))
 
-def mavenPublication = publishing.publications.named('csrfPlugin')
 afterEvaluate {
-    signing {
-        required = { isReleaseVersion }
-        sign mavenPublication.get()
+    def mavenPublication = project.extensions.findByType(PublishingExtension).publications.named('csrfPlugin')
+    project.extensions.configure(SigningExtension) { SigningExtension se ->
+        se.required = { isReleaseVersion }
+        se.sign(mavenPublication.get())
     }
-}
-
-//do not generate extra load on Nexus with new staging repository if signing fails
-tasks.withType(InitializeNexusStagingRepository).configureEach {
-    shouldRunAfter = tasks.withType(Sign)
 }
 
 if (isReleaseVersion && project.hasProperty('release')) {
     nexusPublishing {
-        String sonatypeUsername = project.findProperty('sonatypeOssUsername') ?: ''
-        String sonatypePassword = project.findProperty('sonatypeOssPassword') ?: ''
-        String sonatypeStagingProfileId = project.findProperty('sonatypeOssStagingProfileId') ?: ''
+        String sonatypeUsername = project.findProperty('sonatypeOssUsername')
+        String sonatypePassword = project.findProperty('sonatypeOssPassword')
+        String sonatypeStagingProfileId = project.findProperty('sonatypeOssStagingProfileId')
         repositories {
             sonatype {
                 nexusUrl = uri('https://s01.oss.sonatype.org/service/local/')
@@ -74,10 +62,6 @@ if (isReleaseVersion && project.hasProperty('release')) {
                 password = sonatypePassword
                 stagingProfileId = sonatypeStagingProfileId
             }
-        }
-        transitionCheckOptions {
-            maxRetries = 100 // Default 60
-            delayBetween = Duration.ofSeconds(5) // Default 10
         }
     }
 }
