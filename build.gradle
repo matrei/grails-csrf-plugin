@@ -7,7 +7,25 @@ plugins {
 
 group = 'io.github.matrei'
 version = projectVersion
-ext.set('isReleaseVersion', !version.toString().endsWith('-SNAPSHOT'))
+ext.set('isSnapshot', projectVersion.endsWith('-SNAPSHOT'))
+ext.set('isReleaseVersion', !isSnapshot)
+
+if (isReleaseVersion && project.hasProperty('release')) {
+    nexusPublishing {
+        String sonatypeUsername = project.findProperty('sonatypeOssUsername')
+        String sonatypePassword = project.findProperty('sonatypeOssPassword')
+        String sonatypeStagingProfileId = project.findProperty('sonatypeOssStagingProfileId')
+        repositories {
+            sonatype {
+                nexusUrl = uri('https://s01.oss.sonatype.org/service/local/')
+                snapshotRepositoryUrl = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
+                username = sonatypeUsername
+                password = sonatypePassword
+                stagingProfileId = sonatypeStagingProfileId
+            }
+        }
+    }
+}
 
 //do not generate extra load on Nexus with new staging repository if signing fails
 tasks.withType(InitializeNexusStagingRepository).configureEach {
