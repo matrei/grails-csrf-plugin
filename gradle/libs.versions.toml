@@ -1,6 +1,6 @@
 [versions]
 assetpipeline-grails = '4.3.0'
-geb = '6.0'
+geb = '7.0'
 grails = '6.2.0'
 grails-geb = '4.0.0'
 grails-gsp = '6.2.1'
