@@ -1,6 +1,6 @@
 # Grails CSRF Protection Plugin
 
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.matrei/grails-csrf-plugin.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.matrei/grails-csrf-plugin) [![Java CI](https://github.com/matrei/grails-csrf-plugin/actions/workflows/gradle-check.yml/badge.svg?event=push)](https://github.com/matrei/grails-inertia-plugin/actions/workflows/gradle-check.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.matrei/grails-csrf.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.matrei/grails-csrf-plugin) [![Java CI](https://github.com/matrei/grails-csrf-plugin/actions/workflows/gradle-check.yml/badge.svg?event=push)](https://github.com/matrei/grails-inertia-plugin/actions/workflows/gradle-check.yml)
 
 Add [CSRF](https://owasp.org/www-community/attacks/csrf) protection to your [Grails](https://grails.org) application.
 
@@ -17,7 +17,7 @@ dependencies {
     //...
     // Replace $csrfPluginVersion with a suitable release version for your project,
     // or define it in your gradle.properties file
-    runtimeOnly "io.github.matrei:grails-csrf-plugin:$csrfPluginVersion"
+    runtimeOnly "io.github.matrei:grails-csrf:$csrfPluginVersion"
     //...
 }
 ``` 
