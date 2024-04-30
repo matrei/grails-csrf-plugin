@@ -8,6 +8,7 @@ plugins {
 }
 
 group = 'csrf.test.app'
+version = rootProject.version
 
 repositories {
     mavenCentral()
