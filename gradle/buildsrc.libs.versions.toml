@@ -1,6 +1,6 @@
 [versions]
 assetpipeline-gradleplugin = '4.4.0'
-grails-gradleplugin = '6.2.0'
+grails-gradleplugin = '6.2.3'
 grails-gsp = '6.2.1'
 nexuspublish-gradleplugin = '2.0.0'
 webdriver-binaries = '3.2'
