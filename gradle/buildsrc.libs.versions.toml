@@ -1,5 +1,5 @@
 [versions]
-assetpipeline-gradleplugin = '4.4.0'
+assetpipeline-gradleplugin = '5.0.5'
 grails-gradleplugin = '6.2.0'
 grails-gsp = '6.2.1'
 nexuspublish-gradleplugin = '2.0.0'
