@@ -1,7 +1,5 @@
 plugins {
     id 'application'
-    id 'com.bertramlabs.asset-pipeline'
-    id 'com.github.erdi.webdriver-binaries'
     id 'groovy'
     id 'org.grails.grails-gsp'
     id 'org.grails.grails-web'
@@ -39,8 +37,8 @@ dependencies {
 
     testImplementation libs.grails.testingsupport.web
     testImplementation libs.spock.core
-    integrationTestImplementation libs.bundles.geb
-    integrationTestRuntimeOnly libs.bundles.selenium
+
+    integrationTestImplementation testFixtures(libs.grails.geb)
 }
 
 java {
@@ -49,20 +47,6 @@ java {
 
 application {
     mainClass = 'csrf.test.app.Application'
-}
-
-webdriverBinaries {
-    chromedriver {
-        version = '110.0.5481.77'
-        fallbackTo32Bit = true
-    }
-    geckodriver = '0.32.2'
-    edgedriver = '110.0.1587.57'
-}
-
-assets {
-    minifyJs = true
-    minifyCss = true
 }
 
 apply from: rootProject.layout.projectDirectory.file('gradle/testing-config.gradle')

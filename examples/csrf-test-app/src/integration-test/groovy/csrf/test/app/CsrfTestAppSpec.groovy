@@ -1,10 +1,10 @@
 package csrf.test.app
+
+import grails.plugin.geb.ContainerGebSpec
 import grails.testing.mixin.integration.Integration
 
-import geb.spock.*
-
 @Integration
-class CsrfTestAppSpec extends GebSpec {
+class CsrfTestAppSpec extends ContainerGebSpec {
 
     void 'the csrf tokens are correct'() {
 
