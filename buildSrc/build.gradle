@@ -11,8 +11,6 @@ dependencies {
 
     implementation buildsrcLibs.nexuspublish.gradleplugin
 
-    runtimeOnly buildsrcLibs.assetpipeline.gradleplugin
     runtimeOnly buildsrcLibs.grails.gradleplugin
     runtimeOnly buildsrcLibs.grails.gsp.gradleplugin
-    runtimeOnly buildsrcLibs.webdriverbinaries.gradleplugin
 }
