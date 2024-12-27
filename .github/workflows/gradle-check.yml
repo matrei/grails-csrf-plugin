@@ -4,11 +4,14 @@ on: [push, pull_request]
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: gradle/actions/wrapper-validation@v3
       - uses: actions/setup-java@v4
         with: { java-version: 11, distribution: temurin }
-      - uses: gradle/actions/setup-gradle@v3
-      - run: ./gradlew check -Dgeb.env=firefoxHeadless
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: 'https://gradle.com/terms-of-service'
+          build-scan-terms-of-use-agree: 'yes'
+      - run: ./gradlew check
