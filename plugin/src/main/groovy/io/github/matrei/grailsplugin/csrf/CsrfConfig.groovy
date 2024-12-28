@@ -60,6 +60,7 @@ class CsrfConfig {
      * Settings for the optional XSRF cookie.
      */
     XsrfCookie cookie = new XsrfCookie()
+    @ConfigurationProperties('cookie')
     static class XsrfCookie {
         boolean enabled = true
         String path = '/'
