@@ -2,8 +2,10 @@ package csrf.test.app
 
 import grails.plugin.geb.ContainerGebSpec
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreIf
 
 @Integration
+@IgnoreIf({ System.getProperty('grails.env') != 'test' })
 class CsrfTestAppSpec extends ContainerGebSpec {
 
     void 'the csrf tokens are correct'() {

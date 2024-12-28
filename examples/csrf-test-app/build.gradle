@@ -35,6 +35,7 @@ dependencies {
     runtimeOnly libs.springboot.starter.logging
     runtimeOnly libs.springboot.starter.tomcat
 
+    testImplementation project(':grails-csrf-plugin')
     testImplementation libs.grails.testingsupport.web
     testImplementation libs.spock.core
 
