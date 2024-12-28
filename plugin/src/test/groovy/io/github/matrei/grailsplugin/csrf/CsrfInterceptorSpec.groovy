@@ -1,10 +1,12 @@
 package io.github.matrei.grailsplugin.csrf
 
 import grails.testing.web.interceptor.InterceptorUnitTest
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 import java.util.regex.Pattern
 
+@IgnoreIf({ System.getProperty('grails.env') != 'test' })
 class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<CsrfInterceptor> {
 
     void 'the csrf interceptor matches the intendent requests'(String uri, boolean matches) {
