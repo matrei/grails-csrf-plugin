@@ -1,0 +1,5 @@
+csrf:
+  field-name: 'custom-csrf-field-name'
+  enabled: false
+  cookie:
+    secure: false
