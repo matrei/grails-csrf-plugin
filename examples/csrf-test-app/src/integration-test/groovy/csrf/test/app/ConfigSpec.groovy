@@ -7,7 +7,7 @@ import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 @Integration
-@IgnoreIf({ System.getProperty('geb.env') != 'configtest' })
+@IgnoreIf({ System.getProperty('grails.env') != 'configtest' })
 class ConfigSpec extends Specification {
 
     @Autowired
