@@ -1,6 +1,6 @@
 [versions]
 assetpipeline-grails = '4.5.2'
-grails = '6.2.2'
+grails = '6.2.3'
 grails-geb = '4.1.1'
 grails-gsp = '6.2.1'
 grails-testing-support = '3.2.2'
