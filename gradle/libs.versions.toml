@@ -1,5 +1,5 @@
 [versions]
-assetpipeline-grails = '4.5.2'
+assetpipeline-grails = '5.0.9'
 grails = '6.2.2'
 grails-geb = '4.1.1'
 grails-gsp = '6.2.1'
