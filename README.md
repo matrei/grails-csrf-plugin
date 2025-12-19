@@ -2,7 +2,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.matrei/grails-csrf.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.matrei/grails-csrf-plugin) [![Java CI](https://github.com/matrei/grails-csrf-plugin/actions/workflows/gradle-check.yml/badge.svg?event=push)](https://github.com/matrei/grails-inertia-plugin/actions/workflows/gradle-check.yml)
 
-Add [CSRF](https://owasp.org/www-community/attacks/csrf) protection to your [Grails](https://grails.org) application.
+Add [CSRF](https://owasp.org/www-community/attacks/csrf) protection to your [Grails](https://grails.apache.org) application.
 
 This plugin will validate that all HTTP requests that changes state (POST, PUT, PATCH and DELETE), includes a valid CSRF token.
 
@@ -24,9 +24,9 @@ dependencies {
 
 ## Usage
 
-Using [GSP](https://gsp.grails.org/latest/guide/index.html), you can add the CSRF token to the page head, and to forms, using custom tags.
+Using [GSP](https://grails.apache.org/docs/latest/guide/theWebLayer.html#gsp), you can add the CSRF token to the page head, and to forms, using [GSP Tags](https://grails.apache.org/docs/latest/guide/theWebLayer.html#tags).
 ```html
-<html>
+<html lang="en">
     <head>
         <csrf:headToken/>
     </head>
@@ -55,8 +55,8 @@ In this case, a `XSRF-TOKEN` cookie can be utilized, by reading it and setting a
 This cookie is optionally set by the plugin.
 ```yaml
 csrf:
-    cookie:
-        enabled: false # default is true
+  cookie:
+    enabled: true # default is true
 ```
 
 ## Excluding URIs from CSRF Protection
@@ -67,8 +67,8 @@ In that case you can exclude the URI by adding it to the `excluded` list in the 
 The excluded URIs are regex matched against the request URI.
 ```yaml
 csrf:
-    excluded:
-      - '^/webhooks/.*'
+  excluded:
+    - '^/webhooks/.*'
 ```
 `/error` is always excluded from CSRF protection.
 

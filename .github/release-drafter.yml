@@ -6,7 +6,7 @@ categories:
       - "type: enhancement"
       - "type: new feature"
       - "type: major"
-  - title: 🐛 Bug Fixes/Improvements
+  - title: 🪲 Bug Fixes/Improvements
     labels:
       - "type: improvement"
       - "type: bug"
@@ -19,6 +19,14 @@ categories:
     labels:
       - "type: ci"
       - "type: build"
+  - title: 📖 Documentation
+    labels:
+      - "type: documentation"
+      - "docs"
+  - title: 🧪 Testing
+    labels:
+      - "type: test"
+      - "test"
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 version-resolver:
   major:

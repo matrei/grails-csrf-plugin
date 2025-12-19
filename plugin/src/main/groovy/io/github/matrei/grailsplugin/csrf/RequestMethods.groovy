@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 original authors
+ * Copyright 2024-present original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package io.github.matrei.grailsplugin.csrf
 
 import groovy.transform.CompileStatic
 
-import javax.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletRequest
 
 /**
  * Helper for checking HTTP request methods.
@@ -34,7 +34,9 @@ class RequestMethods {
     static final String OPTIONS = 'OPTIONS'
 
     /**
-     * Determines if the method of the given {@link HttpServletRequest} represents a read operation.
+     * Determines if the method of the given {@link HttpServletRequest}
+     * represents a read operation.
+     *
      * @param request The {@link HttpServletRequest} to be tested
      * @return true if the method of the request represents a read operation, false otherwise
      */
@@ -44,6 +46,7 @@ class RequestMethods {
 
     /**
      * Determine if the given request method is a read operation.
+     *
      * @param method the method to be tested e.g., 'GET', 'POST'
      * @return true if the method represents a read operation, false otherwise
      */

@@ -1,9 +1,33 @@
-rootProject.name = "grails-csrf"
+rootProject.name = 'grails-csrf.ROOT'
 
 include 'plugin'
-project(':plugin').name = 'grails-csrf-plugin'
+project(':plugin').name = 'grails-csrf'
 
 file('examples').eachDir { dir ->
     include "examples-$dir.name"
     project(":examples-$dir.name").projectDir = dir
+}
+
+dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositories {
+        mavenCentral()
+        maven { url = 'https://repo.grails.org/grails/restricted' }
+        maven {
+            url = 'https://repository.apache.org/content/repositories/staging'
+            content {
+                includeGroupAndSubgroups('org.apache.grails')
+                includeGroupAndSubgroups('org.apache.groovy')
+            }
+            mavenContent { releasesOnly() }
+        }
+        maven {
+            url = 'https://repository.apache.org/content/repositories/snapshots'
+            content {
+                includeGroupAndSubgroups('org.apache.grails')
+                includeGroupAndSubgroups('org.apache.groovy')
+            }
+            mavenContent { snapshotsOnly() }
+        }
+    }
 }

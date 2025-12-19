@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 original authors
+ * Copyright 2024-present original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package io.github.matrei.grailsplugin.csrf
 
-import groovy.transform.CompileStatic
-import io.micronaut.context.annotation.ConfigurationProperties
-import io.micronaut.context.annotation.Requires
-
 import java.util.regex.Pattern
+
+import groovy.transform.CompileStatic
+
+import org.springframework.boot.context.properties.ConfigurationProperties
 
 /**
  * Configuration properties for CSRF protection.
@@ -28,10 +28,8 @@ import java.util.regex.Pattern
  * @since 1.0.0
   */
 @CompileStatic
-@ConfigurationProperties(PREFIX)
+@ConfigurationProperties('csrf')
 class CsrfConfig {
-
-    private static final String PREFIX = 'csrf'
 
     /**
      * The name of the CSRF token input field.
@@ -39,7 +37,7 @@ class CsrfConfig {
     String fieldName = '_token'
 
     /**
-     * The name under with the CSRF token is stored in the session.
+     * The name under which the CSRF token is stored in the session.
      */
     String attributeName = 'io.github.matrei.grailsplugin.csrf.token'
 
@@ -60,7 +58,8 @@ class CsrfConfig {
      * Settings for the optional XSRF cookie.
      */
     XsrfCookie cookie = new XsrfCookie()
-    @ConfigurationProperties('cookie')
+
+    @CompileStatic
     static class XsrfCookie {
         boolean enabled = true
         String path = '/'
