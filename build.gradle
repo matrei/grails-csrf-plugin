@@ -1,33 +1,10 @@
-import io.github.gradlenexus.publishplugin.InitializeNexusStagingRepository
-
-plugins {
-    id 'groovy'
-    id 'io.github.gradle-nexus.publish-plugin'
-}
-
+// Workaround needed for nexus publishing bug
+// version and group must be specified in the root project
+// https://github.com/gradle-nexus/publish-plugin/issues/310
 version = projectVersion
-ext.set('grailsVersion', libs.versions.grails.asProvider().get())
-ext.set('isSnapshot', version.toString().endsWith('-SNAPSHOT'))
-ext.set('isReleaseVersion', !isSnapshot)
-
-if (isReleaseVersion && project.hasProperty('release')) {
-    nexusPublishing {
-        String sonatypeUsername = project.findProperty('sonatypeOssUsername')
-        String sonatypePassword = project.findProperty('sonatypeOssPassword')
-        String sonatypeStagingProfileId = project.findProperty('sonatypeOssStagingProfileId')
-        repositories {
-            sonatype {
-                nexusUrl = uri('https://s01.oss.sonatype.org/service/local/')
-                snapshotRepositoryUrl = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
-                username = sonatypeUsername
-                password = sonatypePassword
-                stagingProfileId = sonatypeStagingProfileId
-            }
-        }
+group = 'io.github.matrei'
+subprojects {
+    if (name == 'grails-csrf') {
+        apply plugin: 'org.apache.grails.gradle.grails-publish'
     }
-}
-
-//do not generate extra load on Nexus with new staging repository if signing fails
-tasks.withType(InitializeNexusStagingRepository).configureEach {
-    shouldRunAfter = tasks.withType(Sign)
 }

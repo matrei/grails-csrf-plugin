@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 original authors
+ * Copyright 2024-present original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  */
 package io.github.matrei.grailsplugin.csrf
 
-import groovy.transform.CompileStatic
-import org.springframework.http.ResponseCookie
-
 import java.util.regex.Pattern
 
-import static io.github.matrei.grailsplugin.csrf.RequestMethods.isReadRequest
+import groovy.transform.CompileStatic
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.ResponseCookie
 
 /**
  * Interceptor for CSRF protection.
@@ -36,7 +37,11 @@ class CsrfInterceptor {
     private final CsrfConfig csrfConfig
     private final CsrfTokenValidator tokenValidator
 
-    CsrfInterceptor(CsrfConfig csrfConfig, CsrfTokenValidator tokenValidator) {
+    @Autowired
+    CsrfInterceptor(
+            CsrfConfig csrfConfig,
+            @Qualifier('csrfTokenValidator') CsrfTokenValidator tokenValidator
+    ) {
         matchAll().excludes(uri: '/error')
         this.csrfConfig = csrfConfig
         this.tokenValidator = tokenValidator
@@ -66,7 +71,7 @@ class CsrfInterceptor {
     }
 
     private boolean isTokensMatch() {
-        tokenValidator.validateToken(storedToken, requestToken)
+        this.tokenValidator.validateToken(storedToken, requestToken)
     }
 
     private String getStoredToken() {
@@ -81,7 +86,7 @@ class CsrfInterceptor {
     }
 
     private boolean getIsReadRequest() {
-        isReadRequest(request)
+        RequestMethods.isReadRequest(request)
     }
 
     private boolean isUriExcluded() {

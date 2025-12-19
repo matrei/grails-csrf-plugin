@@ -12,3 +12,7 @@ out/
 .settings
 .classpath
 .factorypath
+!.idea/codeStyles/
+!.idea/codeStyles/Project.xml
+!.idea/codeStyles/codeStyleConfig.xml
+!buildSrc/src/main/groovy/build

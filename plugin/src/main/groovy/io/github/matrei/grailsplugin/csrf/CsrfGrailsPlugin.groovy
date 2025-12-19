@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 original authors
+ * Copyright 2024-present original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package io.github.matrei.grailsplugin.csrf
 
+import groovy.transform.CompileStatic
 
 import grails.plugins.Plugin
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 
 /**
  * Grails plugin descriptor.
@@ -30,24 +29,13 @@ import groovy.transform.CompileStatic
 @SuppressWarnings('unused')
 class CsrfGrailsPlugin extends Plugin {
 
-    String grailsVersion = '6.0.0 > *'
-    List<String> pluginExcludes = []
-    String title = 'Grails CSRF Protection'
-    String author = 'Mattias Reichel'
-    String authorEmail = 'mattias.reichel@gmail.com'
-    String description = 'Provides CSRF protection for Grails applications.'
-    String documentation = 'https://github.com/matrei/grails-csrf-plugin#readme'
-    String license = 'APACHE'
+    def grailsVersion = '7.0.0 > *'
+    def title = 'Grails CSRF Protection'
+    def description = 'Provides CSRF protection for Grails applications.'
+    def author = 'Mattias Reichel'
+    def documentation = 'https://github.com/matrei/grails-csrf-plugin#readme'
+    def license = 'APACHE 2.0 License'
+    def issueManagement = [system: 'GitHub', url: 'https://github.com/matrei/grails-csrf-plugin/issues']
+    def scm = [url: 'https://github.com/matrei/grails-csrf-plugin']
 
-    // Any additional developers beyond the author specified above.
-    // def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
-
-    Map<String,String> issueManagement = [system: 'GitHub', url: 'https://github.com/matrei/grails-csrf-plugin/issues']
-    Map<String,String> scm = [url: 'https://github.com/matrei/grails-csrf-plugin']
-
-    @Override
-    @CompileDynamic
-    Closure doWithSpring() {{->
-        csrfSessionHandler(CsrfSessionHandler)
-    }}
 }

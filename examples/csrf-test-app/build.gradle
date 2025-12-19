@@ -1,53 +1,43 @@
 plugins {
-    id 'application'
-    id 'groovy'
-    id 'org.grails.grails-gsp'
-    id 'org.grails.grails-web'
-}
-
-group = 'csrf.test.app'
-version = rootProject.version
-
-repositories {
-    mavenCentral()
-    maven { url = 'https://repo.grails.org/grails/core' }
+    id 'build.config.grails-test-app'
+    id 'cloud.wondrify.asset-pipeline'
 }
 
 dependencies {
 
-/*
-    // Temporary workaround for Intellij Grails plugin
-    implementation 'org.grails:grails-shell:6.1.2', {
-        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    runtimeOnly project(':grails-csrf')
+
+    implementation 'org.apache.grails:grails-dependencies-starter-web'
+    implementation 'org.apache.grails:grails-dependencies-assets'
+
+    runtimeOnly 'cloud.wondrify:asset-pipeline-grails'
+
+    testAndDevelopmentOnly 'org.webjars.npm:bootstrap'
+    testAndDevelopmentOnly 'org.webjars.npm:bootstrap-icons'
+    testAndDevelopmentOnly 'org.webjars.npm:jquery'
+
+    testImplementation project(':grails-csrf'), {
+        // impl: CsrfConfig
     }
-*/
+    testImplementation 'org.apache.grails:grails-testing-support-web'
+    testImplementation 'org.spockframework:spock-core'
 
-    runtimeOnly project(':grails-csrf-plugin')
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    implementation libs.grails.core
-    implementation libs.grails.gsp // Needs to be implementation for GSP compilation to work
-    implementation libs.springboot.starter
-
-    runtimeOnly libs.assetpipeline.grails
-    runtimeOnly libs.grails.i18n
-    runtimeOnly libs.grails.urlmappings
-    runtimeOnly libs.springboot.autoconfigure
-    runtimeOnly libs.springboot.starter.logging
-    runtimeOnly libs.springboot.starter.tomcat
-
-    testImplementation project(':grails-csrf-plugin')
-    testImplementation libs.grails.testingsupport.web
-    testImplementation libs.spock.core
-
-    integrationTestImplementation testFixtures(libs.grails.geb)
+    integrationTestImplementation testFixtures('org.apache.grails:grails-geb')
 }
 
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(libs.versions.java.baseline.get())
+assets {
+    excludes = [
+            'webjars/jquery/**',
+            'webjars/bootstrap/**',
+            'webjars/bootstrap-icons/**'
+    ]
+    includes = [
+            'webjars/jquery/*/dist/jquery.js',
+            'webjars/bootstrap/*/dist/js/bootstrap.bundle.js',
+            'webjars/bootstrap/*/dist/css/bootstrap.css',
+            'webjars/bootstrap-icons/*/font/bootstrap-icons.css',
+            'webjars/bootstrap-icons/*/font/fonts/*',
+    ]
 }
-
-application {
-    mainClass = 'csrf.test.app.Application'
-}
-
-apply from: rootProject.layout.projectDirectory.file('gradle/testing-config.gradle')

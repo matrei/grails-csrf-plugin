@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 original authors
+ * Copyright 2024-present original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 package io.github.matrei.grailsplugin.csrf
 
 import groovy.transform.CompileStatic
-//import org.springframework.stereotype.Component
 
-import javax.servlet.http.HttpSessionEvent
-import javax.servlet.http.HttpSessionListener
+import jakarta.servlet.http.HttpSessionEvent
+import jakarta.servlet.http.HttpSessionListener
+
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Handles CSRF token generation and storage in the session.
@@ -27,21 +28,27 @@ import javax.servlet.http.HttpSessionListener
  * @author Mattias Reichel
  * @since 1.0.0
  */
-//@Component
 @CompileStatic
 class CsrfSessionHandler implements HttpSessionListener {
 
     private final CsrfConfig csrfConfig
     private final CsrfTokenGenerator generator
 
-    CsrfSessionHandler(CsrfConfig csrfConfig, CsrfTokenGenerator generator) {
+    @Autowired
+    CsrfSessionHandler(
+            CsrfConfig csrfConfig,
+            CsrfTokenGenerator generator
+    ) {
         this.csrfConfig = csrfConfig
         this.generator = generator
     }
 
     @Override
     void sessionCreated(HttpSessionEvent event) {
-        event.session.setAttribute(csrfConfig.attributeName, generator.generateToken())
+        event.session.setAttribute(
+                csrfConfig.attributeName,
+                generator.generateToken()
+        )
     }
 
     @Override

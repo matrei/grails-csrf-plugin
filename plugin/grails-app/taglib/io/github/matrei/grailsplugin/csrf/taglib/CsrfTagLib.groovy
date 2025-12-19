@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 original authors
+ * Copyright 2024-present original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package io.github.matrei.grailsplugin.csrf.taglib
 
-
 import groovy.transform.CompileStatic
+
 import io.github.matrei.grailsplugin.csrf.CsrfConfig
 
 /**

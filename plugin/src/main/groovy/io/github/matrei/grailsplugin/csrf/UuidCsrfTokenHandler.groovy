@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 original authors
+ * Copyright 2024-present original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 package io.github.matrei.grailsplugin.csrf
 
 import groovy.transform.CompileStatic
-import jakarta.inject.Singleton
+
+import org.springframework.stereotype.Service
 
 /**
  * Default implementation of {@link CsrfTokenGenerator} and {@link CsrfTokenValidator}.
@@ -25,7 +26,7 @@ import jakarta.inject.Singleton
  * @author Mattias Reichel
  * @since 1.0.0
  */
-@Singleton
+@Service
 @CompileStatic
 class UuidCsrfTokenHandler implements CsrfTokenGenerator, CsrfTokenValidator {
 

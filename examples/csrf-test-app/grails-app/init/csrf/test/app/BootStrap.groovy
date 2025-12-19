@@ -1,9 +1,9 @@
 package csrf.test.app
 
-class BootStrap {
+import groovy.transform.CompileStatic
 
-    def init = { servletContext ->
-    }
-    def destroy = {
-    }
+@CompileStatic
+class BootStrap {
+    def init = {}
+    def destroy = {}
 }
