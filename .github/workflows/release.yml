@@ -14,6 +14,7 @@ env:
   VERSION: will be computed in each job
 jobs:
   publish:
+    name: "Publish to Sonatype Staging Repository"
     runs-on: ubuntu-24.04
     steps:
       - name: "📝 Establish release version"
