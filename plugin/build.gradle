@@ -1,11 +1,7 @@
+import org.apache.grails.gradle.publish.GrailsPublishExtension
+
 plugins {
     id 'build.config.grails-plugin'
-}
-
-ext {
-    pomDevelopers = [
-        matrei: 'Mattias Reichel',
-    ]
 }
 
 dependencies {
@@ -23,3 +19,14 @@ dependencies {
 
     testRuntimeOnly 'org.slf4j:slf4j-nop' // Get rid of warning about missing slf4j implementation during test task
 }
+
+extensions.configure(GrailsPublishExtension) {
+    it.title = 'Grails Plugin for CSRF protection'
+    it.desc = 'Provides CSRF protection for Grails applications.'
+    it.license.name = 'Apache-2.0'
+    it.githubSlug = 'matrei/grails-csrf-plugin'
+    it.developers = [
+            matrei: 'Mattias Reichel',
+    ]
+}
+
