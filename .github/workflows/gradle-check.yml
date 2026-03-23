@@ -10,7 +10,6 @@ on:
 env:
   GRAILS_PUBLISH_RELEASE: 'false'
   JAVA_DISTRIBUTION: liberica
-  JAVA_VERSION: 17.0.17 # keep in sync with .sdkmanrc
 jobs:
   check:
     name: "Test Project"
@@ -22,6 +21,13 @@ jobs:
     steps:
       - name: "📥 Checkout repository"
         uses: actions/checkout@v6
+      - name: "📝 Export .sdkmanrc properties to environment variables"
+        uses: apache/grails-github-actions/export-gradle-properties@asf
+        with:
+          file: ".sdkmanrc"
+          prefix: "SDKMANRC_"
+      - name: "☕️ Determine Java version from .sdkmanrc"
+        run: echo "JAVA_VERSION=${{ env.SDKMANRC_java }}" | sed 's/-.*//' >> $GITHUB_ENV
       - name: "☕️ Setup JDK"
         uses: actions/setup-java@v5
         with:

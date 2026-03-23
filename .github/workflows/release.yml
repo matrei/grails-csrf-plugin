@@ -8,7 +8,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GRAILS_PUBLISH_RELEASE: 'true'
   JAVA_DISTRIBUTION: liberica
-  JAVA_VERSION: 17.0.17 # this must be a specific version for reproducible builds, keep it sync with .sdkmanrc
   NEXUS_PUBLISH_URL: https://ossrh-staging-api.central.sonatype.com/service/local/
   REPO_NAME: ${{ github.event.repository.name }}
   TAG: ${{ github.event.release.tag_name }}
@@ -30,6 +29,13 @@ jobs:
         run: echo "SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)" >> "$GITHUB_ENV"
       - name: "📅 Ensure source files use common date"
         run: find . -depth \( -type f -o -type d \) -exec touch -d "@${SOURCE_DATE_EPOCH}" {} +
+      - name: "📝 Export .sdkmanrc properties to environment variables"
+        uses: apache/grails-github-actions/export-gradle-properties@asf
+        with:
+          file: ".sdkmanrc"
+          prefix: "SDKMANRC_"
+      - name: "☕️ Determine Java version from .sdkmanrc"
+        run: echo "JAVA_VERSION=${{ env.SDKMANRC_java }}" | sed 's/-.*//' >> $GITHUB_ENV
       - name: "☕️ Setup JDK"
         uses: actions/setup-java@v5
         with:
@@ -89,6 +95,13 @@ jobs:
         with:
           ref: ${{ env.TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "📝 Export .sdkmanrc properties to environment variables"
+        uses: apache/grails-github-actions/export-gradle-properties@asf
+        with:
+          file: ".sdkmanrc"
+          prefix: "SDKMANRC_"
+      - name: "☕️ Determine Java version from .sdkmanrc"
+        run: echo "JAVA_VERSION=${{ env.SDKMANRC_java }}" | sed 's/-.*//' >> $GITHUB_ENV
       - name: "☕️ Setup JDK"
         uses: actions/setup-java@v5
         with:
