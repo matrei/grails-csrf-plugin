@@ -22,8 +22,6 @@ dependencies {
     testImplementation 'org.apache.grails:grails-testing-support-web'
     testImplementation 'org.spockframework:spock-core'
 
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
     integrationTestImplementation testFixtures('org.apache.grails:grails-geb')
 }
 

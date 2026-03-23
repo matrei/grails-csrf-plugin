@@ -20,11 +20,5 @@ class Test implements Plugin<Project> {
                     System.getProperty('grails.env', 'test')
             )
         }
-        project.pluginManager.withPlugin('java') {
-            project.dependencies.add(
-                    'testImplementation',
-                    'org.junit.jupiter:junit-jupiter-api'
-            )
-        }
     }
 }
