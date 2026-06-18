@@ -14,7 +14,7 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: echo "value=${GITHUB_REF:11}" >> $GITHUB_OUTPUT
         id: extract_branch
       - uses: release-drafter/release-drafter@v6
