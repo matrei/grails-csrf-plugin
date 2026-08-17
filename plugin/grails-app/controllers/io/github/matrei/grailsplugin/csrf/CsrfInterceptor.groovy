@@ -54,7 +54,7 @@ class CsrfInterceptor {
             }
             return true
         }
-        response.sendError(419, 'CSRF token mismatch.')
+        response.sendError(403, 'CSRF token mismatch.')
         return false
     }
 
