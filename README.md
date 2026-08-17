@@ -1,4 +1,4 @@
-# Grails CSRF Protection Plugin
+# 🧩 Grails CSRF Protection Plugin
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.matrei/grails-csrf.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.matrei/grails-csrf-plugin) [![Java CI](https://github.com/matrei/grails-csrf-plugin/actions/workflows/gradle-check.yml/badge.svg?event=push)](https://github.com/matrei/grails-inertia-plugin/actions/workflows/gradle-check.yml)
 
@@ -6,9 +6,9 @@ Add [CSRF](https://owasp.org/www-community/attacks/csrf) protection to your [Gra
 
 This plugin will validate that all HTTP requests that changes state (POST, PUT, PATCH and DELETE), includes a valid CSRF token.
 
-Any such request that does not include a valid token will be rejected with a `419 Forbidden` status code.
+Any such request that does not include a valid token will be rejected with a `403 Forbidden` status code.
 
-## Installation
+## 📦 Plugin Installation
 
 Add the plugin dependency to the project:
 
@@ -22,7 +22,7 @@ dependencies {
 }
 ``` 
 
-## Usage
+## 📖 Usage
 
 Using [GSP](https://grails.apache.org/docs/latest/guide/theWebLayer.html#gsp), you can add the CSRF token to the page head, and to forms, using [GSP Tags](https://grails.apache.org/docs/latest/guide/theWebLayer.html#tags).
 ```html
@@ -59,7 +59,7 @@ csrf:
     enabled: true # default is true
 ```
 
-## Excluding URIs from CSRF Protection
+### Excluding URIs from CSRF Protection
 Sometimes you may want to exclude certain URIs from CSRF protection.
 For example, you may want to exclude a webhook URI that is called by a third-party service.
 
@@ -72,7 +72,7 @@ csrf:
 ```
 `/error` is always excluded from CSRF protection.
 
-## Configuration
+### Configuration
 The following are available configuration options for the plugin (this is the default configuration):
 ```yaml
 csrf:
