@@ -16,7 +16,6 @@ class GrailsPlugin implements Plugin<Project>, GrailsProject {
         configureGrailsVersion(project)
         project.pluginManager.apply('org.apache.grails.gradle.grails-plugin')
         project.pluginManager.apply('build.config.java')
-        project.pluginManager.apply('build.config.publish')
         project.pluginManager.apply('build.config.reproducible')
         project.pluginManager.apply('build.config.test')
         project.extensions.configure(GrailsExtension) {
