@@ -1,5 +1,6 @@
 package io.github.matrei.grailsplugin.csrf
 
+import java.security.Principal
 import java.util.regex.Pattern
 
 import jakarta.servlet.http.Cookie
@@ -187,6 +188,25 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
 
         then: 'the cookie is sent again'
             response.getHeader('Set-Cookie').startsWith("XSRF-TOKEN=${token};")
+    }
+
+    void 'a token issued before login is only accepted while the user is unchanged'(String user, boolean accepted) {
+        given: 'a token issued to an anonymous user'
+            var token = applicationContext.getBean(CsrfSessionHandler).loadOrCreateToken(request)
+
+        when: 'the token is submitted by the current user'
+            request.userPrincipal = user ? { -> user } as Principal : null
+            request.method = 'POST'
+            request.addHeader('X-CSRF-TOKEN', token)
+            withRequest(uri: '/')
+
+        then: 'the token is only accepted if the user has not logged in since'
+            interceptor.before() == accepted
+
+        where:
+            user    | accepted
+            null    | true
+            'alice' | false
     }
 
     private CsrfConfig getPluginConfig() {

@@ -65,6 +65,27 @@ With the cookie enabled, the token (and the session) is created on the first req
 so that it can be sent in the cookie.
 The cookie is only sent when the browser does not already have the current token.
 
+### Login and Logout
+A token is bound to the user it was issued to, as reported by `request.getUserPrincipal()`
+(set by, for example, Spring Security or container authentication).
+When the user logs in, logs out or changes, the old token is no longer accepted,
+and a new token is created the next time one is needed.
+Pages rendered before the change must be reloaded to get the new token.
+
+If your application handles login and logout itself, without setting the user principal,
+clear the token when the user changes:
+```groovy
+class LoginController {
+
+    CsrfSessionHandler csrfSessionHandler
+
+    def login() {
+        // ...authenticate the user...
+        csrfSessionHandler.clearToken(request)
+    }
+}
+```
+
 ### Excluding URIs from CSRF Protection
 Sometimes you may want to exclude certain URIs from CSRF protection.
 For example, you may want to exclude a webhook URI that is called by a third-party service.
