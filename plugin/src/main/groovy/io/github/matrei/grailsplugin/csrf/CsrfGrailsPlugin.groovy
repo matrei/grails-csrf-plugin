@@ -29,7 +29,7 @@ import grails.plugins.Plugin
 @SuppressWarnings('unused')
 class CsrfGrailsPlugin extends Plugin {
 
-    def grailsVersion = '7.0.0 > *'
+    def grailsVersion = '8.0.0 > *'
     def title = 'Grails CSRF Protection'
     def description = 'Provides CSRF protection for Grails applications.'
     def author = 'Mattias Reichel'
