@@ -37,28 +37,32 @@ class CsrfInterceptor {
     private final CsrfConfig csrfConfig
     private final CsrfSessionHandler sessionHandler
     private final CsrfTokenValidator tokenValidator
+    private final CsrfFailureHandler failureHandler
 
     @Autowired
     CsrfInterceptor(
             CsrfConfig csrfConfig,
             CsrfSessionHandler sessionHandler,
-            @Qualifier('csrfTokenValidator') CsrfTokenValidator tokenValidator
+            @Qualifier('csrfTokenValidator') CsrfTokenValidator tokenValidator,
+            CsrfFailureHandler failureHandler
     ) {
         matchAll().excludes(uri: '/error')
         this.csrfConfig = csrfConfig
         this.sessionHandler = sessionHandler
         this.tokenValidator = tokenValidator
+        this.failureHandler = failureHandler
     }
 
     boolean before() {
-        if (isReadRequest || uriExcluded || tokensMatch) {
-            if (csrfConfig.cookie.enabled) {
-                addCookieForJs()
-            }
-            return true
+        var failure = isReadRequest || uriExcluded ? null : tokenFailure
+        if (failure) {
+            failureHandler.handle(request, response, failure)
+            return false
         }
-        response.sendError(403, 'CSRF token mismatch.')
-        return false
+        if (csrfConfig.cookie.enabled) {
+            addCookieForJs()
+        }
+        return true
     }
 
     private void addCookieForJs() {
@@ -77,10 +81,20 @@ class CsrfInterceptor {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
     }
 
-    private boolean isTokensMatch() {
+    private CsrfFailureReason getTokenFailure() {
         var tokenInStorage = storedToken
-        // Never accept a request when there is no stored token, whatever the validator says
-        tokenInStorage && tokenValidator.validateToken(tokenInStorage, requestToken)
+        if (!tokenInStorage) {
+            // Never accept a request when there is no stored token, whatever the validator says
+            return CsrfFailureReason.MISSING_STORED_TOKEN
+        }
+        var tokenFromRequest = requestToken
+        if (!tokenFromRequest) {
+            return CsrfFailureReason.MISSING_REQUEST_TOKEN
+        }
+        if (!tokenValidator.validateToken(tokenInStorage, tokenFromRequest)) {
+            return CsrfFailureReason.INVALID_TOKEN
+        }
+        return null
     }
 
     private String getStoredToken() {

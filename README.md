@@ -6,7 +6,7 @@ Add [CSRF](https://owasp.org/www-community/attacks/csrf) protection to your [Gra
 
 This plugin will validate that all HTTP requests that changes state (POST, PUT, PATCH and DELETE), includes a valid CSRF token.
 
-Any such request that does not include a valid token will be rejected with a `403 Forbidden` status code.
+By default, any such request that does not include a valid token will be rejected with a `403 Forbidden` status code.
 
 ## 📦 Plugin Installation
 
@@ -85,6 +85,46 @@ class LoginController {
     }
 }
 ```
+
+### Handling Failures
+By default, a request that fails CSRF protection is rejected with `403 Forbidden`,
+which you can handle with a `"403"` URL mapping, like any other error status.
+
+To respond differently, register a `CsrfFailureHandler` bean.
+It is told why the request was rejected:
+
+| `CsrfFailureReason`     | Meaning                                                                      |
+|-------------------------|------------------------------------------------------------------------------|
+| `MISSING_STORED_TOKEN`  | No token is stored, typically because the session expired or the user changed |
+| `MISSING_REQUEST_TOKEN` | The request does not include a token                                         |
+| `INVALID_TOKEN`         | The token in the request does not match the stored token                      |
+
+```groovy
+class SessionExpiredCsrfFailureHandler implements CsrfFailureHandler {
+
+    @Override
+    void handle(HttpServletRequest request, HttpServletResponse response, CsrfFailureReason reason) {
+        if (reason == CsrfFailureReason.MISSING_STORED_TOKEN) {
+            response.sendRedirect('/session-expired')
+        } else {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, reason.message)
+        }
+    }
+}
+```
+```groovy
+class Application extends GrailsAutoConfiguration {
+
+    static void main(String[] args) {
+        GrailsApp.run(Application, args)
+    }
+
+    def beans = {
+        bean(CsrfFailureHandler, SessionExpiredCsrfFailureHandler)
+    }
+}
+```
+Your code then needs the plugin at compile time, so declare it with `implementation` instead of `runtimeOnly`.
 
 ### Excluding URIs from CSRF Protection
 Sometimes you may want to exclude certain URIs from CSRF protection.

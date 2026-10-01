@@ -47,6 +47,7 @@ class CsrfGrailsPlugin extends Plugin {
         bean(CsrfTokenGenerator, UuidCsrfTokenHandler).conditionalOnMissingBean()
         bean(CsrfTokenValidator, UuidCsrfTokenHandler).conditionalOnMissingBean()
         bean(CsrfSessionHandler).conditionalOnMissingBean { CsrfConfig config, CsrfTokenGenerator csrfTokenGenerator -> }
+        bean(CsrfFailureHandler, ForbiddenCsrfFailureHandler).conditionalOnMissingBean()
     }
 
 }

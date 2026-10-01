@@ -20,6 +20,7 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
             csrfTokenGenerator(UuidCsrfTokenHandler)
             csrfTokenValidator(UuidCsrfTokenHandler)
             csrfSessionHandler(CsrfSessionHandler, ref('csrfConfig'), ref('csrfTokenGenerator'))
+            csrfFailureHandler(ForbiddenCsrfFailureHandler)
         }
     }
 
@@ -114,7 +115,8 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
             var interceptor = new CsrfInterceptor(
                     pluginConfig,
                     applicationContext.getBean(CsrfSessionHandler),
-                    { String stored, String fromRequest -> true } as CsrfTokenValidator
+                    { String stored, String fromRequest -> true } as CsrfTokenValidator,
+                    new ForbiddenCsrfFailureHandler()
             )
 
         and: 'a session with a missing or empty token'
@@ -207,6 +209,46 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
             user    | accepted
             null    | true
             'alice' | false
+    }
+
+    void 'the failure handler is told why a request was rejected'(String storedToken, String sentToken, CsrfFailureReason reason) {
+        given: 'an interceptor with a failure handler that records the reason'
+            CsrfFailureReason handledReason = null
+            var interceptor = new CsrfInterceptor(
+                    pluginConfig,
+                    applicationContext.getBean(CsrfSessionHandler),
+                    new UuidCsrfTokenHandler(),
+                    { request, response, CsrfFailureReason failure -> handledReason = failure } as CsrfFailureHandler
+            )
+
+        and: 'a stored token'
+            if (storedToken) {
+                session.setAttribute(pluginConfig.attributeName, storedToken)
+            }
+
+        when: 'a write request comes in'
+            request.method = 'POST'
+            if (sentToken) {
+                request.addHeader('X-CSRF-TOKEN', sentToken)
+            }
+            withRequest(uri: '/')
+            var result = interceptor.before()
+
+        then: 'the request is only allowed when the tokens match'
+            result == !reason
+
+        and: 'the handler is called with the reason'
+            handledReason == reason
+
+        and: 'the default response is not sent when the handler is replaced'
+            response.status == 200
+
+        where:
+            storedToken | sentToken | reason
+            null        | 'abc'     | CsrfFailureReason.MISSING_STORED_TOKEN
+            'abc'       | null      | CsrfFailureReason.MISSING_REQUEST_TOKEN
+            'abc'       | 'abd'     | CsrfFailureReason.INVALID_TOKEN
+            'abc'       | 'abc'     | null
     }
 
     private CsrfConfig getPluginConfig() {
