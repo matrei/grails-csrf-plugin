@@ -14,17 +14,4 @@ trait GrailsProject {
         }
         project.version = version
     }
-
-    void configureGrailsVersion(Project project) {
-        def grailsVersion = project.findProperty('grailsVersion') as String
-        if (!grailsVersion) {
-            throw new IllegalStateException('grailsVersion property must be set for Grails projects')
-        }
-        project.pluginManager.withPlugin('java') {
-            project.dependencies.add(
-                'implementation',
-                project.dependencies.platform("org.apache.grails:grails-bom:$grailsVersion")
-            )
-        }
-    }
 }
