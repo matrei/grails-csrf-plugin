@@ -59,12 +59,6 @@ gradlePlugin {
             displayName = 'Java Build Configuration'
             description = 'Configures Java for the build'
         }
-        register('publish') {
-            id = 'build.config.publish'
-            implementationClass = 'build.config.Publish'
-            displayName = 'Publish Configuration'
-            description = 'Configures publishing'
-        }
         register('reproducible') {
             id = 'build.config.reproducible'
             implementationClass = 'build.config.Reproducible'
