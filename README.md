@@ -82,7 +82,7 @@ csrf:
   cookie:
     enabled: true # set XSRF-TOKEN cookie
     path: '/'
-    domain: null
+    domain: null # null means the cookie is only sent to the current host, not its subdomains
     secure: true
     sameSite: 'Lax'
 ```

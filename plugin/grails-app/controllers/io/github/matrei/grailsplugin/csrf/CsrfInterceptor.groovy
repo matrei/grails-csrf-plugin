@@ -62,7 +62,7 @@ class CsrfInterceptor {
         def cookie = ResponseCookie.from(COOKIE_XSRF, storedToken)
               .maxAge(session.maxInactiveInterval)
               .path(csrfConfig.cookie.path ?: request.contextPath ?: '/')
-              .domain(csrfConfig.cookie.domain ?: request.serverName)
+              .domain(csrfConfig.cookie.domain) // Host-only cookie unless a domain is configured
               .secure(csrfConfig.cookie.secure ?: request.secure)
               .httpOnly(false) // This cookie is for JS consumption
               .sameSite(csrfConfig.cookie.sameSite)

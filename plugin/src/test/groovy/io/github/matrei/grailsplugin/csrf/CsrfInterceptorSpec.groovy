@@ -75,6 +75,29 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
             httpMethod << ['POST', 'PUT', 'PATCH', 'DELETE']
     }
 
+    void 'the xsrf cookie is host-only unless a domain is configured'(String domain, String expectedDomainAttribute) {
+        given: 'a session with a token'
+            session.setAttribute(applicationContext.getBean(CsrfConfig).attributeName, 'abc')
+
+        and: 'a configured cookie domain'
+            applicationContext.getBean(CsrfConfig).cookie.domain = domain
+
+        when: 'a read request comes in'
+            request.method = 'GET'
+            withRequest(uri: '/')
+            interceptor.before()
+
+        then: 'the cookie has the expected domain attribute'
+            var cookie = response.getHeader('Set-Cookie')
+            cookie.startsWith('XSRF-TOKEN=abc')
+            expectedDomainAttribute ? cookie.contains(expectedDomainAttribute) : !cookie.contains('Domain=')
+
+        where:
+            domain        | expectedDomainAttribute
+            null          | null
+            'example.com' | 'Domain=example.com'
+    }
+
     void 'write requests are rejected without a stored token, whatever the validator says'(String tokenInStorage) {
         given: 'a validator that accepts any token'
             var interceptor = new CsrfInterceptor(
