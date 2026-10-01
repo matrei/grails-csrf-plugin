@@ -17,6 +17,9 @@ package io.github.matrei.grailsplugin.csrf
 
 import groovy.transform.CompileStatic
 
+import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+
 import grails.plugins.Plugin
 
 /**
@@ -26,7 +29,9 @@ import grails.plugins.Plugin
  * @since 1.0.0
  */
 @CompileStatic
+@AutoConfiguration
 @SuppressWarnings('unused')
+@EnableConfigurationProperties(CsrfConfig)
 class CsrfGrailsPlugin extends Plugin {
 
     def grailsVersion = '8.0.0 > *'
@@ -37,5 +42,11 @@ class CsrfGrailsPlugin extends Plugin {
     def license = 'APACHE 2.0 License'
     def issueManagement = [system: 'GitHub', url: 'https://github.com/matrei/grails-csrf-plugin/issues']
     def scm = [url: 'https://github.com/matrei/grails-csrf-plugin']
+
+    def beans = {
+        bean(CsrfTokenGenerator, UuidCsrfTokenHandler).conditionalOnMissingBean()
+        bean(CsrfTokenValidator, UuidCsrfTokenHandler).conditionalOnMissingBean()
+        bean(CsrfSessionHandler).lazy().conditionalOnMissingBean { CsrfConfig config, CsrfTokenGenerator csrfTokenGenerator -> }
+    }
 
 }
