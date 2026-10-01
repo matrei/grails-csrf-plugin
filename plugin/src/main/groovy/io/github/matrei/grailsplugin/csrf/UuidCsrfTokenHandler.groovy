@@ -15,6 +15,9 @@
  */
 package io.github.matrei.grailsplugin.csrf
 
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+
 import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Service
@@ -42,6 +45,8 @@ class UuidCsrfTokenHandler implements CsrfTokenGenerator, CsrfTokenValidator {
 
     /**
      * Validates a token.
+     * The tokens are compared in constant time to not leak information through response timing.
+     * Missing or empty tokens are never valid.
      *
      * @param tokenInStorage The valid token
      * @param tokenFromRequest The token to test
@@ -49,6 +54,9 @@ class UuidCsrfTokenHandler implements CsrfTokenGenerator, CsrfTokenValidator {
      */
     @Override
     boolean validateToken(String tokenInStorage, String tokenFromRequest) {
-        tokenFromRequest == tokenInStorage
+        tokenInStorage && tokenFromRequest && MessageDigest.isEqual(
+                tokenInStorage.getBytes(StandardCharsets.UTF_8),
+                tokenFromRequest.getBytes(StandardCharsets.UTF_8)
+        )
     }
 }

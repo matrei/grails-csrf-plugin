@@ -74,4 +74,26 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
         where:
             httpMethod << ['POST', 'PUT', 'PATCH', 'DELETE']
     }
+
+    void 'write requests are rejected without a stored token, whatever the validator says'(String tokenInStorage) {
+        given: 'a validator that accepts any token'
+            var interceptor = new CsrfInterceptor(
+                    applicationContext.getBean(CsrfConfig),
+                    { String stored, String fromRequest -> true } as CsrfTokenValidator
+            )
+
+        and: 'a session with a missing or empty token'
+            session.setAttribute(applicationContext.getBean(CsrfConfig).attributeName, tokenInStorage)
+
+        when: 'a write request without a token comes in'
+            request.method = 'POST'
+            withRequest(uri: '/')
+
+        then: 'the request is rejected'
+            !interceptor.before()
+            response.status == 403
+
+        where:
+            tokenInStorage << [null, '']
+    }
 }

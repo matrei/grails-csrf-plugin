@@ -71,7 +71,9 @@ class CsrfInterceptor {
     }
 
     private boolean isTokensMatch() {
-        this.tokenValidator.validateToken(storedToken, requestToken)
+        var tokenInStorage = storedToken
+        // Never accept a request when there is no stored token, whatever the validator says
+        tokenInStorage && tokenValidator.validateToken(tokenInStorage, requestToken)
     }
 
     private String getStoredToken() {
