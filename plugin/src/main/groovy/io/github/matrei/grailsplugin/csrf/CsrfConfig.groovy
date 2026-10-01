@@ -61,7 +61,7 @@ class CsrfConfig {
 
     @CompileStatic
     static class XsrfCookie {
-        boolean enabled = true
+        boolean enabled = false
         String path = '/'
         String domain = null
         boolean secure = true

@@ -20,6 +20,7 @@ import groovy.transform.CompileStatic
 import grails.gsp.Tag
 
 import io.github.matrei.grailsplugin.csrf.CsrfConfig
+import io.github.matrei.grailsplugin.csrf.CsrfSessionHandler
 
 /**
  * Tag library for CSRF protection.
@@ -33,9 +34,11 @@ class CsrfTagLib {
     static namespace = 'csrf'
 
     private final CsrfConfig csrfConfig
+    private final CsrfSessionHandler sessionHandler
 
-    CsrfTagLib(CsrfConfig csrfConfig) {
+    CsrfTagLib(CsrfConfig csrfConfig, CsrfSessionHandler sessionHandler) {
         this.csrfConfig = csrfConfig
+        this.sessionHandler = sessionHandler
     }
 
     /**
@@ -43,7 +46,7 @@ class CsrfTagLib {
      */
     @Tag
     void headToken() {
-        var token = session.getAttribute(csrfConfig.attributeName)
+        var token = sessionHandler.loadOrCreateToken(request)
         out << "<meta name=\"csrf-token\" content=\"$token\"/>"
     }
 
@@ -52,7 +55,7 @@ class CsrfTagLib {
      */
     @Tag
     void formToken() {
-        var token = session.getAttribute(csrfConfig.attributeName)
+        var token = sessionHandler.loadOrCreateToken(request)
         out << "<input type=\"hidden\" name=\"$csrfConfig.fieldName\" value=\"$token\"/>"
     }
 }

@@ -2,6 +2,8 @@ package io.github.matrei.grailsplugin.csrf
 
 import java.util.regex.Pattern
 
+import jakarta.servlet.http.Cookie
+
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 
@@ -14,8 +16,15 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
     Closure doWithSpring() {
         { ->
             csrfConfig(CsrfConfig)
+            csrfTokenGenerator(UuidCsrfTokenHandler)
             csrfTokenValidator(UuidCsrfTokenHandler)
+            csrfSessionHandler(CsrfSessionHandler, ref('csrfConfig'), ref('csrfTokenGenerator'))
         }
+    }
+
+    void setup() {
+        // The config bean is shared between features, so reset what features change
+        pluginConfig.cookie = new CsrfConfig.XsrfCookie()
     }
 
     void 'the csrf interceptor matches the intendent requests'(String uri, boolean matches) {
@@ -77,10 +86,11 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
 
     void 'the xsrf cookie is host-only unless a domain is configured'(String domain, String expectedDomainAttribute) {
         given: 'a session with a token'
-            session.setAttribute(applicationContext.getBean(CsrfConfig).attributeName, 'abc')
+            session.setAttribute(pluginConfig.attributeName, 'abc')
 
-        and: 'a configured cookie domain'
-            applicationContext.getBean(CsrfConfig).cookie.domain = domain
+        and: 'an enabled cookie with a configured domain'
+            pluginConfig.cookie.enabled = true
+            pluginConfig.cookie.domain = domain
 
         when: 'a read request comes in'
             request.method = 'GET'
@@ -101,12 +111,13 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
     void 'write requests are rejected without a stored token, whatever the validator says'(String tokenInStorage) {
         given: 'a validator that accepts any token'
             var interceptor = new CsrfInterceptor(
-                    applicationContext.getBean(CsrfConfig),
+                    pluginConfig,
+                    applicationContext.getBean(CsrfSessionHandler),
                     { String stored, String fromRequest -> true } as CsrfTokenValidator
             )
 
         and: 'a session with a missing or empty token'
-            session.setAttribute(applicationContext.getBean(CsrfConfig).attributeName, tokenInStorage)
+            session.setAttribute(pluginConfig.attributeName, tokenInStorage)
 
         when: 'a write request without a token comes in'
             request.method = 'POST'
@@ -118,5 +129,67 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
 
         where:
             tokenInStorage << [null, '']
+    }
+
+    void 'read requests do not create a session when the cookie is disabled'() {
+        when: 'a read request comes in'
+            request.method = 'GET'
+            withRequest(uri: '/')
+            var result = interceptor.before()
+
+        then: 'the request is allowed'
+            result
+
+        and: 'no session or cookie is created'
+            request.getSession(false) == null
+            response.getHeader('Set-Cookie') == null
+    }
+
+    void 'write requests without a session are rejected without creating one'() {
+        when: 'a write request comes in without a session'
+            request.method = 'POST'
+            withRequest(uri: '/')
+            var result = interceptor.before()
+
+        then: 'the request is rejected'
+            !result
+            response.status == 403
+
+        and: 'no session is created'
+            request.getSession(false) == null
+    }
+
+    void 'the cookie creates a token and is only sent when the browser does not have it'() {
+        given: 'an enabled cookie'
+            pluginConfig.cookie.enabled = true
+
+        when: 'a read request comes in without a session'
+            request.method = 'GET'
+            withRequest(uri: '/')
+            interceptor.before()
+
+        then: 'a token is created and sent in the cookie'
+            var token = applicationContext.getBean(CsrfSessionHandler).loadToken(request)
+            token
+            response.getHeader('Set-Cookie').startsWith("XSRF-TOKEN=${token};")
+
+        when: 'the next request already carries the current token'
+            response.reset()
+            request.cookies = new Cookie('XSRF-TOKEN', token)
+            interceptor.before()
+
+        then: 'the cookie is not sent again'
+            response.getHeader('Set-Cookie') == null
+
+        when: 'the browser has a stale token'
+            request.cookies = new Cookie('XSRF-TOKEN', 'stale')
+            interceptor.before()
+
+        then: 'the cookie is sent again'
+            response.getHeader('Set-Cookie').startsWith("XSRF-TOKEN=${token};")
+    }
+
+    private CsrfConfig getPluginConfig() {
+        applicationContext.getBean(CsrfConfig)
     }
 }

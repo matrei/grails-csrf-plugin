@@ -35,15 +35,18 @@ class CsrfInterceptor {
     private static final String COOKIE_XSRF = 'XSRF-TOKEN'
 
     private final CsrfConfig csrfConfig
+    private final CsrfSessionHandler sessionHandler
     private final CsrfTokenValidator tokenValidator
 
     @Autowired
     CsrfInterceptor(
             CsrfConfig csrfConfig,
+            CsrfSessionHandler sessionHandler,
             @Qualifier('csrfTokenValidator') CsrfTokenValidator tokenValidator
     ) {
         matchAll().excludes(uri: '/error')
         this.csrfConfig = csrfConfig
+        this.sessionHandler = sessionHandler
         this.tokenValidator = tokenValidator
     }
 
@@ -59,8 +62,12 @@ class CsrfInterceptor {
     }
 
     private void addCookieForJs() {
-        def cookie = ResponseCookie.from(COOKIE_XSRF, storedToken)
-              .maxAge(session.maxInactiveInterval)
+        // The cookie needs a token, so this creates the session and the token if needed
+        var token = sessionHandler.loadOrCreateToken(request)
+        if (cookieValueFromRequest == token) {
+            return // The browser already has the current token
+        }
+        var cookie = ResponseCookie.from(COOKIE_XSRF, token)
               .path(csrfConfig.cookie.path ?: request.contextPath ?: '/')
               .domain(csrfConfig.cookie.domain) // Host-only cookie unless a domain is configured
               .secure(csrfConfig.cookie.secure ?: request.secure)
@@ -77,7 +84,11 @@ class CsrfInterceptor {
     }
 
     private String getStoredToken() {
-        session.getAttribute(csrfConfig.attributeName)
+        sessionHandler.loadToken(request)
+    }
+
+    private String getCookieValueFromRequest() {
+        request.cookies?.find { it.name == COOKIE_XSRF }?.value
     }
 
     private String getRequestToken() {

@@ -39,6 +39,9 @@ Using [GSP](https://grails.apache.org/docs/latest/guide/theWebLayer.html#gsp), y
     </body>
 </html>
 ```
+The token is stored in the HTTP session, and is created the first time one of the tags is rendered.
+Requests that do not render a tag do not create a session or a token.
+
 The head `token` can be used by `JavaScript` libraries (like `jQuery`) to automatically make `CSRF`-compatible `Ajax` requests.
 ```javascript
 // jQuery example
@@ -52,12 +55,15 @@ For `SPA`-type applications, the head is typically not refreshed, so the `token`
 
 In this case, a `XSRF-TOKEN` cookie can be utilized, by reading it and setting an `X-XSRF-TOKEN` header on the requests (done automatically by [Axios](https://axios-http.com/docs/req_config)).
 
-This cookie is optionally set by the plugin.
+The plugin can set this cookie, but it is disabled by default.
 ```yaml
 csrf:
   cookie:
-    enabled: true # default is true
+    enabled: true # default is false
 ```
+With the cookie enabled, the token (and the session) is created on the first request,
+so that it can be sent in the cookie.
+The cookie is only sent when the browser does not already have the current token.
 
 ### Excluding URIs from CSRF Protection
 Sometimes you may want to exclude certain URIs from CSRF protection.
@@ -80,7 +86,7 @@ csrf:
   attributeName: 'io.github.matrei.grailsplugin.csrf.token' # session attribute name for token storage
   excluded: [] # paths to exclude from CSRF protection
   cookie:
-    enabled: true # set XSRF-TOKEN cookie
+    enabled: false # set XSRF-TOKEN cookie
     path: '/'
     domain: null # null means the cookie is only sent to the current host, not its subdomains
     secure: true

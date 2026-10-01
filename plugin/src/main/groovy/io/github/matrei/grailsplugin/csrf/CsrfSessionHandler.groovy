@@ -17,24 +17,23 @@ package io.github.matrei.grailsplugin.csrf
 
 import groovy.transform.CompileStatic
 
-import jakarta.servlet.http.HttpSessionEvent
-import jakarta.servlet.http.HttpSessionListener
+import jakarta.servlet.http.HttpServletRequest
 
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.util.WebUtils
 
 /**
  * Handles CSRF token generation and storage in the session.
+ * Tokens, and the sessions holding them, are only created when they are needed.
  *
  * @author Mattias Reichel
  * @since 1.0.0
  */
 @CompileStatic
-class CsrfSessionHandler implements HttpSessionListener {
+class CsrfSessionHandler {
 
     private final CsrfConfig csrfConfig
     private final CsrfTokenGenerator generator
 
-    @Autowired
     CsrfSessionHandler(
             CsrfConfig csrfConfig,
             CsrfTokenGenerator generator
@@ -43,16 +42,31 @@ class CsrfSessionHandler implements HttpSessionListener {
         this.generator = generator
     }
 
-    @Override
-    void sessionCreated(HttpSessionEvent event) {
-        event.session.setAttribute(
-                csrfConfig.attributeName,
-                generator.generateToken()
-        )
+    /**
+     * Returns the token stored in the session, without creating a session or a token.
+     *
+     * @param request The current request
+     * @return the stored token, or null if there is none
+     */
+    String loadToken(HttpServletRequest request) {
+        request.getSession(false)?.getAttribute(csrfConfig.attributeName) as String
     }
 
-    @Override
-    void sessionDestroyed(HttpSessionEvent event) {
-        // no-op
+    /**
+     * Returns the token stored in the session, creating the session and the token if needed.
+     *
+     * @param request The current request
+     * @return the stored token
+     */
+    String loadOrCreateToken(HttpServletRequest request) {
+        var session = request.session
+        synchronized (WebUtils.getSessionMutex(session)) {
+            var token = session.getAttribute(csrfConfig.attributeName) as String
+            if (!token) {
+                token = generator.generateToken()
+                session.setAttribute(csrfConfig.attributeName, token)
+            }
+            token
+        }
     }
 }
