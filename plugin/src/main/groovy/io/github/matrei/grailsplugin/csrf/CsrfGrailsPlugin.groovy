@@ -17,8 +17,10 @@ package io.github.matrei.grailsplugin.csrf
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.web.servlet.FilterRegistrationBean
 
 import grails.plugins.Plugin
 
@@ -48,6 +50,17 @@ class CsrfGrailsPlugin extends Plugin {
         bean(CsrfTokenValidator, UuidCsrfTokenHandler).conditionalOnMissingBean()
         bean(CsrfSessionHandler).conditionalOnMissingBean { CsrfConfig config, CsrfTokenGenerator csrfTokenGenerator -> }
         bean(CsrfFailureHandler, ForbiddenCsrfFailureHandler).conditionalOnMissingBean()
+        bean('csrfFilterRegistration', FilterRegistrationBean).typeArguments(CsrfFilter)
+                .conditionalOnMissingBeanName {
+            CsrfConfig config,
+            CsrfSessionHandler csrfSessionHandler,
+            @Qualifier('csrfTokenValidator') CsrfTokenValidator csrfTokenValidator,
+            CsrfFailureHandler csrfFailureHandler ->
+            var filter = new CsrfFilter(config, csrfSessionHandler, csrfTokenValidator, csrfFailureHandler)
+            new FilterRegistrationBean<CsrfFilter>(filter).tap {
+                order = config.filter.order
+            }
+        }
     }
 
 }

@@ -55,6 +55,21 @@ class CsrfConfig {
     }
 
     /**
+     * Settings for the CSRF filter.
+     */
+    FilterSettings filter = new FilterSettings()
+
+    @CompileStatic
+    static class FilterSettings {
+
+        /**
+         * The order of the filter in the servlet filter chain.
+         * The default runs it right after Spring Security's filter chain.
+         */
+        int order = CsrfFilter.DEFAULT_ORDER
+    }
+
+    /**
      * Settings for the optional XSRF cookie.
      */
     XsrfCookie cookie = new XsrfCookie()

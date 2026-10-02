@@ -8,6 +8,9 @@ This plugin will validate that all HTTP requests that changes state (POST, PUT, 
 
 By default, any such request that does not include a valid token will be rejected with a `403 Forbidden` status code.
 
+The check is done by a servlet filter, so it covers every request, whether it is handled by a Grails controller,
+another servlet or another filter.
+
 ## 📦 Plugin Installation
 
 Add the plugin dependency to the project:
@@ -141,7 +144,24 @@ csrf:
   excluded:
     - '^/webhooks/.*'
 ```
-`/error` is always excluded from CSRF protection.
+Since every request is checked, this includes endpoints that are not Grails controllers,
+such as Spring Boot Actuator endpoints that accept `POST`, or the H2 console:
+```yaml
+csrf:
+  excluded:
+    - '^/actuator/.*'
+    - '^/h2-console/.*'
+```
+Error pages are never checked.
+
+### Spring Security
+The filter runs right after Spring Security's filter chain, so that the logged-in user is known
+(see [Login and Logout](#login-and-logout)).
+Requests that Spring Security handles itself, such as its login and logout URLs, are therefore not checked by this plugin.
+If you need CSRF protection for those, use Spring Security's own CSRF protection instead of this plugin.
+Using both at the same time means two separate tokens are required.
+
+The position of the filter can be changed with `csrf.filter.order`.
 
 ### Configuration
 The following are available configuration options for the plugin (this is the default configuration):
@@ -150,6 +170,8 @@ csrf:
   fieldName: '_token' # token form field name
   attributeName: 'io.github.matrei.grailsplugin.csrf.token' # session attribute name for token storage
   excluded: [] # paths to exclude from CSRF protection
+  filter:
+    order: -99 # right after Spring Security's filter chain (-100)
   cookie:
     enabled: false # set XSRF-TOKEN cookie
     path: '/'

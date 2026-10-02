@@ -15,22 +15,33 @@
  */
 package io.github.matrei.grailsplugin.csrf
 
-import java.util.regex.Pattern
-
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+import jakarta.servlet.FilterChain
+import jakarta.servlet.ServletException
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+
 import org.springframework.http.ResponseCookie
+import org.springframework.web.filter.OncePerRequestFilter
 
 /**
- * Interceptor for CSRF protection.
+ * Servlet filter for CSRF protection.
+ *
+ * Checks every request that is not a read request, whatever handles it: Grails controllers,
+ * other servlets and other filters later in the chain. It runs after Spring Security,
+ * so that the user is known for tokens bound to the user.
  *
  * @author Mattias Reichel
- * @since 1.0.0
+ * @since 3.0.0
  */
 @CompileStatic
-class CsrfInterceptor {
+class CsrfFilter extends OncePerRequestFilter {
+
+    /**
+     * The default order of the filter, right after Spring Security's filter chain.
+     */
+    static final int DEFAULT_ORDER = -99
 
     private static final String COOKIE_XSRF = 'XSRF-TOKEN'
 
@@ -39,36 +50,36 @@ class CsrfInterceptor {
     private final CsrfTokenValidator tokenValidator
     private final CsrfFailureHandler failureHandler
 
-    @Autowired
-    CsrfInterceptor(
+    CsrfFilter(
             CsrfConfig csrfConfig,
             CsrfSessionHandler sessionHandler,
-            @Qualifier('csrfTokenValidator') CsrfTokenValidator tokenValidator,
+            CsrfTokenValidator tokenValidator,
             CsrfFailureHandler failureHandler
     ) {
-        matchAll().excludes(uri: '/error')
         this.csrfConfig = csrfConfig
         this.sessionHandler = sessionHandler
         this.tokenValidator = tokenValidator
         this.failureHandler = failureHandler
     }
 
-    boolean before() {
-        var failure = isReadRequest || uriExcluded ? null : tokenFailure
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
+        var failure = RequestMethods.isReadRequest(request) || isUriExcluded(request) ? null : tokenFailure(request)
         if (failure) {
             failureHandler.handle(request, response, failure)
-            return false
+            return
         }
         if (csrfConfig.cookie.enabled) {
-            addCookieForJs()
+            addCookieForJs(request, response)
         }
-        return true
+        chain.doFilter(request, response)
     }
 
-    private void addCookieForJs() {
+    private void addCookieForJs(HttpServletRequest request, HttpServletResponse response) {
         // The cookie needs a token, so this creates the session and the token if needed
         var token = sessionHandler.loadOrCreateToken(request)
-        if (cookieValueFromRequest == token) {
+        if (cookieValueFromRequest(request) == token) {
             return // The browser already has the current token
         }
         var cookie = ResponseCookie.from(COOKIE_XSRF, token)
@@ -81,13 +92,13 @@ class CsrfInterceptor {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
     }
 
-    private CsrfFailureReason getTokenFailure() {
-        var tokenInStorage = storedToken
+    private CsrfFailureReason tokenFailure(HttpServletRequest request) {
+        var tokenInStorage = sessionHandler.loadToken(request)
         if (!tokenInStorage) {
             // Never accept a request when there is no stored token, whatever the validator says
             return CsrfFailureReason.MISSING_STORED_TOKEN
         }
-        var tokenFromRequest = requestToken
+        var tokenFromRequest = requestToken(request)
         if (!tokenFromRequest) {
             return CsrfFailureReason.MISSING_REQUEST_TOKEN
         }
@@ -104,30 +115,18 @@ class CsrfInterceptor {
                 tokenValidator.validateToken(tokenInStorage, tokenFromRequest)
     }
 
-    private String getStoredToken() {
-        sessionHandler.loadToken(request)
+    private String requestToken(HttpServletRequest request) {
+        request.getParameter(csrfConfig.fieldName) ?:
+                request.getHeader(HttpHeaders.CSRF) ?:
+                request.getHeader(HttpHeaders.XSRF)
     }
 
-    private String getCookieValueFromRequest() {
+    private boolean isUriExcluded(HttpServletRequest request) {
+        var uri = request.requestURI
+        csrfConfig.excludedPatterns.any { uri.matches(it) }
+    }
+
+    private static String cookieValueFromRequest(HttpServletRequest request) {
         request.cookies?.find { it.name == COOKIE_XSRF }?.value
-    }
-
-    private String getRequestToken() {
-        return request.getParameter(csrfConfig.fieldName) ?:
-               request.getHeader(HttpHeaders.CSRF) ?:
-               request.getHeader(HttpHeaders.XSRF) ?:
-               ''
-    }
-
-    private boolean getIsReadRequest() {
-        RequestMethods.isReadRequest(request)
-    }
-
-    private boolean isUriExcluded() {
-        _isUriExcluded(csrfConfig.excludedPatterns, request.forwardURI)
-    }
-
-    protected static boolean _isUriExcluded(List<Pattern> excluded, String uri) {
-        excluded.any { uri.matches(it) }
     }
 }

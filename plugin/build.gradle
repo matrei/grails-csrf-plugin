@@ -7,7 +7,7 @@ plugins {
 dependencies {
 
     compileOnly 'org.apache.grails:grails-core' // Provided
-    compileOnly 'org.apache.grails:grails-interceptors' // Provided
+    compileOnly 'org.apache.grails.views:grails-web-taglib' // Provided
     compileOnly 'org.springframework:spring-context' // Provided
     compileOnly 'org.springframework:spring-web' // Provided
 
