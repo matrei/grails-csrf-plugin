@@ -23,6 +23,7 @@ dependencies {
     testImplementation 'org.spockframework:spock-core'
 
     integrationTestImplementation testFixtures('org.apache.grails:grails-geb')
+    integrationTestImplementation 'org.apache.grails:grails-testing-support-http-client'
 }
 
 assets {
