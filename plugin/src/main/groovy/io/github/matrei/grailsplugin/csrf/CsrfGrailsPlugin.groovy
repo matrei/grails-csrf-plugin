@@ -19,6 +19,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 
@@ -48,7 +49,14 @@ class CsrfGrailsPlugin extends Plugin {
     def beans = {
         bean(CsrfTokenGenerator, UuidCsrfTokenHandler).conditionalOnMissingBean()
         bean(CsrfTokenValidator, UuidCsrfTokenHandler).conditionalOnMissingBean()
-        bean(CsrfSessionHandler).conditionalOnMissingBean { CsrfConfig config, CsrfTokenGenerator csrfTokenGenerator -> }
+        bean('csrfUserResolver', CsrfUserResolver, PrincipalCsrfUserResolver).conditionalOnMissingBean()
+                .annotate(ConditionalOnMissingClass, value: 'org.springframework.security.core.context.SecurityContextHolder')
+        group('springSecurityUser').conditionalOnClass(name: 'org.springframework.security.core.context.SecurityContextHolder') {
+            bean('springSecurityCsrfUserResolver', CsrfUserResolver, SpringSecurityCsrfUserResolver).conditionalOnMissingBean()
+        }
+        bean(CsrfSessionHandler).conditionalOnMissingBean {
+            CsrfConfig config, CsrfTokenGenerator csrfTokenGenerator, CsrfUserResolver csrfUserResolver ->
+        }
         bean(CsrfFailureHandler, ForbiddenCsrfFailureHandler).conditionalOnMissingBean()
         bean('csrfFilterRegistration', FilterRegistrationBean).typeArguments(CsrfFilter)
                 .conditionalOnMissingBeanName {

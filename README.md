@@ -73,13 +73,15 @@ so that it can be sent in the cookie.
 The cookie is only sent when the browser does not already have the current token.
 
 ### Login and Logout
-A token is bound to the user it was issued to, as reported by `request.getUserPrincipal()`
-(set by, for example, Spring Security or container authentication).
+A token is bound to the user it was issued to.
+With Spring Security, the user is taken from its security context,
+otherwise from `request.getUserPrincipal()` (set by, for example, container authentication).
+To resolve the user differently, register a `CsrfUserResolver` bean.
 When the user logs in, logs out or changes, the old token is no longer accepted,
 and a new token is created the next time one is needed.
 Pages rendered before the change must be reloaded to get the new token.
 
-If your application handles login and logout itself, without setting the user principal,
+If your application handles login and logout itself, without a user the plugin can resolve,
 clear the token when the user changes:
 ```groovy
 class LoginController {

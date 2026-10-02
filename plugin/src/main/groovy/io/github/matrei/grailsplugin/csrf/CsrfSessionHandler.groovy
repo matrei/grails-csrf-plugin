@@ -26,9 +26,9 @@ import org.springframework.web.util.WebUtils
  * Handles CSRF token generation and storage in the session.
  * Tokens, and the sessions holding them, are only created when they are needed.
  *
- * A token is bound to the user it was issued to, as reported by
- * {@link HttpServletRequest#getUserPrincipal()}. When the user changes, on login or logout,
- * the token is no longer valid and a new one is created the next time one is needed.
+ * A token is bound to the user it was issued to, as resolved by the {@link CsrfUserResolver}.
+ * When the user changes, on login or logout, the token is no longer valid
+ * and a new one is created the next time one is needed.
  *
  * @author Mattias Reichel
  * @since 1.0.0
@@ -38,14 +38,17 @@ class CsrfSessionHandler {
 
     private final CsrfConfig csrfConfig
     private final CsrfTokenGenerator generator
+    private final CsrfUserResolver userResolver
     private final String principalAttributeName
 
     CsrfSessionHandler(
             CsrfConfig csrfConfig,
-            CsrfTokenGenerator generator
+            CsrfTokenGenerator generator,
+            CsrfUserResolver userResolver = new PrincipalCsrfUserResolver()
     ) {
         this.csrfConfig = csrfConfig
         this.generator = generator
+        this.userResolver = userResolver
         this.principalAttributeName = "${csrfConfig.attributeName}.principal"
     }
 
@@ -87,8 +90,7 @@ class CsrfSessionHandler {
     /**
      * Removes the token from the session, without creating a session.
      * A new token is created the next time one is needed.
-     * Call this on login and logout when the user is not reported by
-     * {@link HttpServletRequest#getUserPrincipal()}.
+     * Call this on login and logout when the user is not known to the {@link CsrfUserResolver}.
      *
      * @param request The current request
      */
@@ -102,7 +104,7 @@ class CsrfSessionHandler {
         session.getAttribute(principalAttributeName) == principal
     }
 
-    private static String principalName(HttpServletRequest request) {
-        request.userPrincipal?.name
+    private String principalName(HttpServletRequest request) {
+        userResolver.currentUser(request)
     }
 }
