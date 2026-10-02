@@ -32,6 +32,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class CsrfConfig {
 
     /**
+     * Whether CSRF protection is enabled.
+     * When disabled, requests are not checked and the tags render nothing.
+     */
+    boolean enabled = true
+
+    /**
      * The name of the CSRF token input field.
      */
     String fieldName = '_token'

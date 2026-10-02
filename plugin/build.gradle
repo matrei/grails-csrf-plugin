@@ -11,6 +11,7 @@ dependencies {
     compileOnly 'org.springframework:spring-context' // Provided
     compileOnly 'org.springframework:spring-web' // Provided
     compileOnly 'org.springframework.security:spring-security-core' // Optional
+    compileOnly 'org.springframework.security:spring-security-web' // Optional
 
     compileOnly 'org.apache.groovy:groovy' // Provided
     compileOnly 'jakarta.servlet:jakarta.servlet-api' // Provided

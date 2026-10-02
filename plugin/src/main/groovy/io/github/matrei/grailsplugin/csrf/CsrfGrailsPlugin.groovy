@@ -17,6 +17,7 @@ package io.github.matrei.grailsplugin.csrf
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.ListableBeanFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass
@@ -59,6 +60,7 @@ class CsrfGrailsPlugin extends Plugin {
         }
         bean(CsrfFailureHandler, ForbiddenCsrfFailureHandler).conditionalOnMissingBean()
         bean('csrfFilterRegistration', FilterRegistrationBean).typeArguments(CsrfFilter)
+                .conditionalOnProperty('csrf.enabled', havingValue: 'true', matchIfMissing: true)
                 .conditionalOnMissingBeanName {
             CsrfConfig config,
             CsrfSessionHandler csrfSessionHandler,
@@ -68,6 +70,11 @@ class CsrfGrailsPlugin extends Plugin {
             new FilterRegistrationBean<CsrfFilter>(filter).tap {
                 order = config.filter.order
             }
+        }
+        group('springSecurity')
+                .conditionalOnClass(name: 'org.springframework.security.web.FilterChainProxy')
+                .conditionalOnProperty('csrf.enabled', havingValue: 'true', matchIfMissing: true) {
+            bean(SpringSecurityCsrfCheck) { ListableBeanFactory beanFactory, CsrfConfig config -> }
         }
     }
 

@@ -160,15 +160,26 @@ Error pages are never checked.
 The filter runs right after Spring Security's filter chain, so that the logged-in user is known
 (see [Login and Logout](#login-and-logout)).
 Requests that Spring Security handles itself, such as its login and logout URLs, are therefore not checked by this plugin.
-If you need CSRF protection for those, use Spring Security's own CSRF protection instead of this plugin.
-Using both at the same time means two separate tokens are required.
+If you need CSRF protection for those, use Spring Security's own CSRF protection instead of this plugin,
+and disable the plugin with:
+```yaml
+csrf:
+  enabled: false
+```
+Using both at the same time means two separate tokens are required,
+and JavaScript requests sending `X-CSRF-TOKEN` can only satisfy one of the checks.
 
 The position of the filter can be changed with `csrf.filter.order`.
+
+At startup, the plugin logs a warning if Spring Security's CSRF protection is enabled for any of its filter chains,
+or if the CSRF filter is ordered to run before Spring Security's filter chain,
+where the logged-in user is not yet known.
 
 ### Configuration
 The following are available configuration options for the plugin (this is the default configuration):
 ```yaml
 csrf:
+  enabled: true # false disables CSRF protection, and the tags render nothing
   fieldName: '_token' # token form field name
   attributeName: 'io.github.matrei.grailsplugin.csrf.token' # session attribute name for token storage
   excluded: [] # paths to exclude from CSRF protection

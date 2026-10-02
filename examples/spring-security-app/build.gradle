@@ -1,0 +1,17 @@
+plugins {
+    id 'build.config.grails-test-app'
+}
+
+dependencies {
+
+    runtimeOnly project(':grails-csrf')
+
+    implementation 'org.apache.grails:grails-dependencies-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    testImplementation project(':grails-csrf')
+    testImplementation 'org.apache.grails:grails-testing-support-web'
+    testImplementation 'org.spockframework:spock-core'
+
+    integrationTestImplementation 'org.apache.grails:grails-testing-support-http-client'
+}

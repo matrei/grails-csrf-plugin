@@ -48,6 +48,9 @@ class CsrfTagLib {
      */
     @Tag
     void headToken() {
+        if (!csrfConfig.enabled) {
+            return
+        }
         var token = CsrfTokenMasking.mask(sessionHandler.loadOrCreateToken(request))
         out << "<meta name=\"csrf-token\" content=\"$token\"/>"
     }
@@ -58,6 +61,9 @@ class CsrfTagLib {
      */
     @Tag
     void formToken() {
+        if (!csrfConfig.enabled) {
+            return
+        }
         var token = CsrfTokenMasking.mask(sessionHandler.loadOrCreateToken(request))
         out << "<input type=\"hidden\" name=\"$csrfConfig.fieldName\" value=\"$token\"/>"
     }
