@@ -1,5 +1,7 @@
 package csrf.test.app
 
+import groovy.transform.CompileStatic
+
 import jakarta.servlet.http.HttpServlet
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -22,6 +24,7 @@ import org.apache.grails.testing.http.client.MultipartBody
 @IgnoreIf({ System.getProperty('grails.env') != 'test' })
 class FilterCoverageSpec extends Specification implements HttpClientSupport {
 
+    @CompileStatic
     @TestConfiguration
     static class PlainServletConfiguration {
 
@@ -31,6 +34,7 @@ class FilterCoverageSpec extends Specification implements HttpClientSupport {
         }
     }
 
+    @CompileStatic
     static class PlainServlet extends HttpServlet {
 
         @Override

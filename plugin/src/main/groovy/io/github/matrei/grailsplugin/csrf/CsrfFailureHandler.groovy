@@ -15,6 +15,8 @@
  */
 package io.github.matrei.grailsplugin.csrf
 
+import groovy.transform.CompileStatic
+
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 
@@ -26,6 +28,7 @@ import jakarta.servlet.http.HttpServletResponse
  * @author Mattias Reichel
  * @since 3.0.0
  */
+@CompileStatic
 interface CsrfFailureHandler {
 
     /**

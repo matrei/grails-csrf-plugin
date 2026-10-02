@@ -2,6 +2,8 @@ package io.github.matrei.grailsplugin.csrf
 
 import java.security.Principal
 
+import groovy.transform.CompileStatic
+
 import org.springframework.mock.web.MockHttpServletRequest
 
 import spock.lang.Specification
@@ -95,6 +97,7 @@ class CsrfSessionHandlerSpec extends Specification {
             request.getSession(false) == null
     }
 
+    @CompileStatic
     private static Principal principal(String name) {
         name ? { -> name } as Principal : null
     }

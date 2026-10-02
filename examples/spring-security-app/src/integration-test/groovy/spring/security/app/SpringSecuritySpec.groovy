@@ -2,6 +2,8 @@ package spring.security.app
 
 import java.net.http.HttpClient
 
+import groovy.transform.CompileStatic
+
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 
@@ -68,16 +70,20 @@ class SpringSecuritySpec extends Specification implements HttpClientSupport {
             post('/', [_token: tokenBeforeLogout, name: 'Grace']).assertStatus(403)
     }
 
+    @CompileStatic
     private TestHttpResponse post(String path, Map<String, String> form) {
         httpPostForm([:], path, form, client)
     }
 
+    @CompileStatic
     private void login() {
         // Spring Security handles its login itself, before the CSRF filter, so no token is needed
         post('/login', [username: 'alice', password: 'password']).assertStatus(200)
     }
 
+    @CompileStatic
     private static String formToken(TestHttpResponse page) {
-        (page.body() =~ /<input type="hidden" name="_token" value="([^"]+)"/)[0][1]
+        var matcher = page.body() =~ /<input type="hidden" name="_token" value="([^"]+)"/
+        matcher.find() ? matcher.group(1) : null
     }
 }

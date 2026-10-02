@@ -1,5 +1,7 @@
 package csrf.test.app
 
+import groovy.transform.CompileStatic
+
 import spock.lang.IgnoreIf
 import spock.lang.Specification
 
@@ -18,6 +20,7 @@ import org.apache.grails.testing.http.client.HttpClientSupport
 @Import(CustomCsrfFailureHandlerSpec.CustomFailureHandlerConfiguration)
 class CustomCsrfFailureHandlerSpec extends Specification implements HttpClientSupport {
 
+    @CompileStatic
     @TestConfiguration
     static class CustomFailureHandlerConfiguration {
 

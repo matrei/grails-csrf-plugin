@@ -15,12 +15,15 @@
  */
 package io.github.matrei.grailsplugin.csrf
 
+import groovy.transform.CompileStatic
+
 /**
  * Generates CSRF tokens.
  *
  * @author Mattias Reichel
  * @since 1.0.0
  */
+@CompileStatic
 interface CsrfTokenGenerator {
 
     String generateToken()

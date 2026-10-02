@@ -2,6 +2,8 @@ package io.github.matrei.grailsplugin.csrf
 
 import java.security.Principal
 
+import groovy.transform.CompileStatic
+
 import jakarta.servlet.DispatcherType
 import jakarta.servlet.RequestDispatcher
 import jakarta.servlet.http.Cookie
@@ -263,6 +265,7 @@ class CsrfFilterSpec extends Specification {
             'abd'                           | false
     }
 
+    @CompileStatic
     private boolean passes() {
         var chain = new MockFilterChain()
         filter.doFilter(request, response, chain)

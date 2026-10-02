@@ -15,12 +15,15 @@
  */
 package io.github.matrei.grailsplugin.csrf
 
+import groovy.transform.CompileStatic
+
 /**
  * Validates CSRF tokens.
  *
  * @author Mattias Reichel
  * @since 1.0.0
  */
+@CompileStatic
 interface CsrfTokenValidator {
 
     boolean validateToken(String tokenInStorage, String tokenFromRequest)

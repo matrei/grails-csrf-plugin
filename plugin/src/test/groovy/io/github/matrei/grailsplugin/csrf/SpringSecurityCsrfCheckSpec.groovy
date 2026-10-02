@@ -1,5 +1,7 @@
 package io.github.matrei.grailsplugin.csrf
 
+import groovy.transform.CompileStatic
+
 import jakarta.servlet.Filter
 
 import org.springframework.beans.factory.support.StaticListableBeanFactory
@@ -76,6 +78,7 @@ class SpringSecurityCsrfCheckSpec extends Specification {
             'Grails Plugin'  | -100      | true
     }
 
+    @CompileStatic
     private static FilterChainProxy filterChainProxy(Filter... extraFilters) {
         var filters = [new SecurityContextHolderFilter(new HttpSessionSecurityContextRepository())] as List<Filter>
         filters.addAll(extraFilters)
