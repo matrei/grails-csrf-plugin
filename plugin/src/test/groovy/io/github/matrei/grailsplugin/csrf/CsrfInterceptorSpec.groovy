@@ -251,6 +251,27 @@ class CsrfInterceptorSpec extends Specification implements InterceptorUnitTest<C
             'abc'       | 'abc'     | null
     }
 
+    void 'masked and raw tokens are accepted, other tokens are not'(String sentToken, boolean accepted) {
+        given: 'a stored token'
+            session.setAttribute(pluginConfig.attributeName, 'abc')
+
+        when: 'a write request comes in with a token'
+            request.method = 'POST'
+            request.addHeader('X-CSRF-TOKEN', sentToken)
+            withRequest(uri: '/')
+
+        then: 'only the stored token, masked or not, is accepted'
+            interceptor.before() == accepted
+
+        where:
+            sentToken                       | accepted
+            CsrfTokenMasking.mask('abc')    | true
+            'abc'                           | true
+            CsrfTokenMasking.mask('abd')    | false
+            CsrfTokenMasking.mask('abcabc') | false
+            'abd'                           | false
+    }
+
     private CsrfConfig getPluginConfig() {
         applicationContext.getBean(CsrfConfig)
     }

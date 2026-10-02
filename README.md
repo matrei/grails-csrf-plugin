@@ -42,6 +42,10 @@ Using [GSP](https://grails.apache.org/docs/latest/guide/theWebLayer.html#gsp), y
 The token is stored in the HTTP session, and is created the first time one of the tags is rendered.
 Requests that do not render a tag do not create a session or a token.
 
+To protect the token against [BREACH](https://www.breachattack.com) attacks,
+the tags render it masked with random bytes, so it is different every time it is rendered,
+even within the same page. Any rendered value is accepted.
+
 The head `token` can be used by `JavaScript` libraries (like `jQuery`) to automatically make `CSRF`-compatible `Ajax` requests.
 ```javascript
 // jQuery example

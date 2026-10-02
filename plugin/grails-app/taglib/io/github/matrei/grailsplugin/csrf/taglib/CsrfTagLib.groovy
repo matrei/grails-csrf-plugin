@@ -21,6 +21,7 @@ import grails.gsp.Tag
 
 import io.github.matrei.grailsplugin.csrf.CsrfConfig
 import io.github.matrei.grailsplugin.csrf.CsrfSessionHandler
+import io.github.matrei.grailsplugin.csrf.CsrfTokenMasking
 
 /**
  * Tag library for CSRF protection.
@@ -43,19 +44,21 @@ class CsrfTagLib {
 
     /**
      * Renders a meta tag with the CSRF token.
+     * The token is masked differently every time it is rendered.
      */
     @Tag
     void headToken() {
-        var token = sessionHandler.loadOrCreateToken(request)
+        var token = CsrfTokenMasking.mask(sessionHandler.loadOrCreateToken(request))
         out << "<meta name=\"csrf-token\" content=\"$token\"/>"
     }
 
     /**
      * Renders a hidden input field with the CSRF token.
+     * The token is masked differently every time it is rendered.
      */
     @Tag
     void formToken() {
-        var token = sessionHandler.loadOrCreateToken(request)
+        var token = CsrfTokenMasking.mask(sessionHandler.loadOrCreateToken(request))
         out << "<input type=\"hidden\" name=\"$csrfConfig.fieldName\" value=\"$token\"/>"
     }
 }

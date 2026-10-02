@@ -91,10 +91,17 @@ class CsrfInterceptor {
         if (!tokenFromRequest) {
             return CsrfFailureReason.MISSING_REQUEST_TOKEN
         }
-        if (!tokenValidator.validateToken(tokenInStorage, tokenFromRequest)) {
+        if (!isValidToken(tokenInStorage, tokenFromRequest)) {
             return CsrfFailureReason.INVALID_TOKEN
         }
         return null
+    }
+
+    private boolean isValidToken(String tokenInStorage, String tokenFromRequest) {
+        // Tokens rendered in pages are masked, while the cookie token is not
+        var unmaskedToken = CsrfTokenMasking.unmask(tokenFromRequest)
+        (unmaskedToken && tokenValidator.validateToken(tokenInStorage, unmaskedToken)) ||
+                tokenValidator.validateToken(tokenInStorage, tokenFromRequest)
     }
 
     private String getStoredToken() {
