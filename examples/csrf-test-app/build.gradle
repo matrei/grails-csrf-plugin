@@ -26,6 +26,11 @@ dependencies {
     integrationTestImplementation 'org.apache.grails:grails-testing-support-http-client'
 }
 
+tasks.named('assetCompile') {
+    // https://github.com/wondrify/asset-pipeline/issues/377
+    notCompatibleWithConfigurationCache('Invokes Task.project at execution time')
+}
+
 assets {
     excludes = [
             'webjars/jquery/**',
